@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { TrendingUp, Activity, Shield, AlertTriangle, Play, ArrowUpRight } from 'lucide-react'
+import { TrendingUp, Activity, Shield, AlertTriangle, Play, ArrowUpRight, Inbox } from 'lucide-react'
 import { StatusBadge } from '../components/shared/StatusBadge'
 import { formatTime, formatTimestamp, getScoreColor } from '../utils/format'
 import type { TestRun } from '../utils/api'
@@ -13,8 +13,71 @@ const mockRuns: TestRun[] = [
   { run_id: 'run-q7r8s9t0', timestamp: '2026-07-25T08:00:00Z', fault_type: 'ec2-termination', target_resource: 'i-0mno345', rto_seconds: 90, rpo_seconds: 25, resilience_score: 94, status: 'Passed', rto_target: 300, rpo_target: 60, report_s3_key: '' },
 ]
 
+/* ─── Skeleton Loading State ─── */
+function DashboardSkeleton() {
+  return (
+    <div className="page-container">
+      <div style={{ marginBottom: 'var(--space-12)' }}>
+        <div className="skeleton skeleton-text" style={{ width: 120, height: 24, borderRadius: 9999, marginBottom: 16 }} />
+        <div className="skeleton skeleton-heading" />
+        <div className="skeleton skeleton-text" style={{ width: '70%' }} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-6)', marginBottom: 'var(--space-8)' }}>
+        <div className="skeleton-card">
+          <div className="skeleton skeleton-text" style={{ width: 80, marginBottom: 24 }} />
+          <div className="skeleton skeleton-score" style={{ marginBottom: 24 }} />
+          <div className="skeleton" style={{ height: 3, borderRadius: 9999 }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="skeleton skeleton-metric" />
+          ))}
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="skeleton skeleton-pill" />
+        ))}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--space-6)' }}>
+        <div className="skeleton-card" style={{ height: 240 }} />
+        <div className="skeleton-card" style={{ height: 240 }} />
+      </div>
+    </div>
+  )
+}
+
+/* ─── Empty State ─── */
+function EmptyState() {
+  return (
+    <div className="empty-state">
+      <div className="empty-state-icon">
+        <Inbox size={28} strokeWidth={1.5} />
+      </div>
+      <div className="empty-state-title">No test runs yet</div>
+      <div className="empty-state-desc">
+        Trigger your first disaster recovery test to start measuring system resilience.
+      </div>
+      <Link to="/new-audit" className="btn btn-primary" style={{ padding: '12px 24px' }}>
+        <Play size={14} />
+        Run First Test
+      </Link>
+    </div>
+  )
+}
+
 export default function Dashboard() {
+  const [loading, setLoading] = useState(true)
   const [runs] = useState<TestRun[]>(mockRuns)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1200)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (loading) return <DashboardSkeleton />
+  if (runs.length === 0) return <EmptyState />
+
   const latestRun = runs[0]
   const passRate = Math.round((runs.filter(r => r.status === 'Passed').length / runs.length) * 100)
   const avgScore = Math.round(runs.reduce((sum, r) => sum + r.resilience_score, 0) / runs.length)
@@ -26,8 +89,8 @@ export default function Dashboard() {
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 6,
-          padding: '4px 12px',
+          gap: 8,
+          padding: '5px 14px',
           background: 'var(--accent-subtle)',
           border: '1px solid rgba(16, 185, 129, 0.15)',
           borderRadius: 9999,
@@ -36,7 +99,7 @@ export default function Dashboard() {
           color: 'var(--accent-primary)',
           marginBottom: 16,
         }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--accent-primary)', boxShadow: '0 0 6px rgba(16, 185, 129, 0.5)' }} />
+          <span className="status-dot status-dot-live" />
           Systems Operational
         </div>
         <h1 style={{
@@ -132,8 +195,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Metrics column — stacked glass cards */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          {/* Metrics column — stacked glass cards with stagger */}
+          <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <MetricCard label="RTO" value={formatTime(latestRun.rto_seconds)} target={formatTime(latestRun.rto_target)} ok={latestRun.rto_seconds <= latestRun.rto_target} />
             <MetricCard label="RPO" value={formatTime(latestRun.rpo_seconds)} target={formatTime(latestRun.rpo_target)} ok={latestRun.rpo_seconds <= latestRun.rpo_target} />
             <MetricCard label="Target" value={latestRun.target_resource} target="" ok={true} />
@@ -142,7 +205,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Stats Row — glass pills */}
+      {/* Stats Row — glass pills with stagger */}
       <div className="animate-in animate-in-delay-2" style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
@@ -191,11 +254,12 @@ export default function Dashboard() {
               View all <ArrowUpRight size={12} />
             </Link>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {runs.slice(0, 4).map((run) => (
               <Link
                 key={run.run_id}
                 to={`/runs/${run.run_id}`}
+                className="stagger-child card-interactive"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -205,15 +269,6 @@ export default function Dashboard() {
                   background: 'rgba(255, 255, 255, 0.02)',
                   border: '1px solid transparent',
                   textDecoration: 'none',
-                  transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)'
-                  e.currentTarget.style.borderColor = 'var(--border-glass)'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'
-                  e.currentTarget.style.borderColor = 'transparent'
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -258,7 +313,7 @@ export default function Dashboard() {
 /* ─── Metric Card (Glass) ─── */
 function MetricCard({ label, value, target, ok }: { label: string; value: string; target: string; ok: boolean }) {
   return (
-    <div style={{
+    <div className="stagger-child card-interactive" style={{
       padding: '14px 18px',
       background: 'var(--bg-glass)',
       backdropFilter: 'blur(12px)',
@@ -268,17 +323,7 @@ function MetricCard({ label, value, target, ok }: { label: string; value: string
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
-    }}
-    onMouseEnter={e => {
-      e.currentTarget.style.background = 'var(--bg-glass-hover)'
-      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
-    }}
-    onMouseLeave={e => {
-      e.currentTarget.style.background = 'var(--bg-glass)'
-      e.currentTarget.style.borderColor = 'var(--border-glass)'
-    }}
-    >
+    }}>
       <div>
         <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
           {label}
@@ -300,11 +345,18 @@ function MetricCard({ label, value, target, ok }: { label: string; value: string
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 10,
           background: ok ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)',
-          color: ok ? 'var(--status-pass)' : 'var(--status-fail)',
         }}>
-          {ok ? '✓' : '✗'}
+          {ok ? (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-pass)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-fail)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          )}
         </span>
       </div>
     </div>
@@ -314,7 +366,7 @@ function MetricCard({ label, value, target, ok }: { label: string; value: string
 /* ─── Stat Pill ─── */
 function StatPill({ icon, label, value, accent, danger }: { icon: React.ReactNode; label: string; value: string; accent?: boolean; danger?: boolean }) {
   return (
-    <div style={{
+    <div className="card-interactive" style={{
       padding: '16px 18px',
       background: 'var(--bg-glass)',
       backdropFilter: 'blur(12px)',
@@ -324,17 +376,7 @@ function StatPill({ icon, label, value, accent, danger }: { icon: React.ReactNod
       display: 'flex',
       alignItems: 'center',
       gap: 12,
-      transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
-    }}
-    onMouseEnter={e => {
-      e.currentTarget.style.background = 'var(--bg-glass-hover)'
-      e.currentTarget.style.transform = 'translateY(-1px)'
-    }}
-    onMouseLeave={e => {
-      e.currentTarget.style.background = 'var(--bg-glass)'
-      e.currentTarget.style.transform = 'translateY(0)'
-    }}
-    >
+    }}>
       <span style={{ color: accent ? 'var(--accent-primary)' : danger ? 'var(--status-fail)' : 'var(--text-muted)' }}>
         {icon}
       </span>

@@ -36,25 +36,29 @@
 }
 
 .btn:active {
-  transform: scale(0.97);
-  transition-duration: 100ms;
+  transform: scale(0.96) translateY(1px);
+  transition-duration: 80ms;
+  box-shadow: none;
 }
 
 .btn-primary {
   background: var(--accent-primary);
   color: #050508;
   font-weight: 600;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+  transition: all 150ms var(--ease-out-expo);
 }
 
 .btn-primary:hover {
   background: var(--accent-hover);
-  box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
   transform: translateY(-1px);
 }
 
 .btn-primary:active {
-  transform: scale(0.97) translateY(0);
+  transform: scale(0.96) translateY(1px);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.1);
+  transition-duration: 80ms;
 }
 
 .btn-secondary {
@@ -63,12 +67,19 @@
   -webkit-backdrop-filter: blur(12px);
   color: var(--text-secondary);
   border: 1px solid var(--border-glass);
+  transition: all 150ms var(--ease-out-expo);
 }
 
 .btn-secondary:hover {
   background: var(--bg-glass-hover);
   border-color: rgba(255, 255, 255, 0.12);
   color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: scale(0.96) translateY(1px);
+  transition-duration: 80ms;
 }
 
 .btn-danger {
@@ -219,6 +230,39 @@
   background: rgba(99, 102, 241, 0.12);
   color: var(--status-info);
   border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+/* ─── Tactile Card Hover ─── */
+.card-interactive {
+  transition: all 200ms var(--ease-out-expo);
+}
+
+.card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.card-interactive:active {
+  transform: scale(0.985);
+  transition-duration: 80ms;
+}
+
+/* ─── Breathing Status Dot ─── */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot-live {
+  background: var(--accent-primary);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.status-dot-fail {
+  background: var(--status-fail);
+  animation: pulseGlowFail 1.5s ease-in-out infinite;
 }
 
 /* ─── Tooltip ─── */

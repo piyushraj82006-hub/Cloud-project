@@ -40,6 +40,7 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
         borderRadius: '50%',
         background: 'currentColor',
         opacity: 0.8,
+        animation: status === 'Passed' ? 'breathe 2.5s ease-in-out infinite' : status === 'Failed' ? 'breathe 1.5s ease-in-out infinite' : 'none',
       }} />
       {config.label}
     </span>

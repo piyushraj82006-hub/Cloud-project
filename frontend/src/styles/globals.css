@@ -137,6 +137,81 @@ code, pre, .mono {
   animation: shimmer 2s ease-in-out infinite;
 }
 
+/* Skeleton variants */
+.skeleton-text {
+  height: 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.skeleton-heading {
+  height: 28px;
+  width: 60%;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.skeleton-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+}
+
+.skeleton-score {
+  width: 120px;
+  height: 72px;
+  border-radius: 8px;
+}
+
+.skeleton-metric {
+  height: 64px;
+  border-radius: var(--radius-lg);
+}
+
+.skeleton-pill {
+  height: 56px;
+  border-radius: var(--radius-lg);
+}
+
+/* ─── Empty State ─── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-16) var(--space-8);
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-6);
+  color: var(--accent-primary);
+}
+
+.empty-state-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 360px;
+  line-height: 1.6;
+  margin-bottom: var(--space-6);
+}
+
 /* ─── Scroll Animations ─── */
 @keyframes fadeInUp {
   from {
@@ -178,6 +253,32 @@ code, pre, .mono {
   }
 }
 
+/* ─── Breathing / Perpetual Micro-animations ─── */
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 6px rgba(16, 185, 129, 0.3); }
+  50% { box-shadow: 0 0 14px rgba(16, 185, 129, 0.6); }
+}
+
+@keyframes pulseGlowFail {
+  0%, 100% { box-shadow: 0 0 6px rgba(244, 63, 94, 0.3); }
+  50% { box-shadow: 0 0 14px rgba(244, 63, 94, 0.6); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
 .animate-in {
   opacity: 0;
   animation: fadeInUp 0.7s var(--ease-out-expo) forwards;
@@ -188,6 +289,21 @@ code, pre, .mono {
 .animate-in-delay-3 { animation-delay: 0.3s; }
 .animate-in-delay-4 { animation-delay: 0.4s; }
 .animate-in-delay-5 { animation-delay: 0.5s; }
+.animate-in-delay-6 { animation-delay: 0.6s; }
+
+/* Stagger children: parent gets .stagger-children, children get .stagger-child */
+.stagger-children .stagger-child {
+  opacity: 0;
+  animation: fadeInUp 0.5s var(--ease-out-expo) forwards;
+}
+.stagger-children .stagger-child:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children .stagger-child:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children .stagger-child:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children .stagger-child:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children .stagger-child:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children .stagger-child:nth-child(6) { animation-delay: 0.3s; }
+.stagger-children .stagger-child:nth-child(7) { animation-delay: 0.35s; }
+.stagger-children .stagger-child:nth-child(8) { animation-delay: 0.4s; }
 
 /* ─── Gradient Text ─── */
 .gradient-text {

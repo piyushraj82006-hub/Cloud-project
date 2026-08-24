@@ -48,13 +48,7 @@ export function Navbar() {
           gap: 6,
           whiteSpace: 'nowrap',
         }}>
-          <span style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: 'var(--accent-primary)',
-            boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)',
-          }} />
+          <span className="status-dot status-dot-live" />
           CG<span style={{ color: 'var(--accent-primary)' }}>DR</span>
         </Link>
 
@@ -74,6 +68,7 @@ export function Navbar() {
             <Link
               key={item.path}
               to={item.path}
+              className="nav-link-item"
               style={{
                 fontSize: 12,
                 fontWeight: isActive ? 600 : 400,
@@ -85,24 +80,11 @@ export function Navbar() {
                 padding: '7px 12px',
                 borderRadius: 9999,
                 background: isActive ? 'var(--accent-subtle)' : 'transparent',
-                transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: 'all 150ms cubic-bezier(0.16, 1, 0.3, 1)',
                 whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={e => {
-                if (!isActive) {
-                  e.currentTarget.style.color = 'var(--text-primary)'
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)'
-                }
-              }}
-              onMouseLeave={e => {
-                if (!isActive) {
-                  e.currentTarget.style.color = 'var(--text-muted)'
-                  e.currentTarget.style.background = 'transparent'
-                }
               }}
             >
               <Icon size={14} strokeWidth={1.5} />
-              <span style={{ display: 'none' }} className="nav-label-desktop">{item.label}</span>
               <span className="nav-label-desktop">{item.label}</span>
             </Link>
           )
@@ -115,6 +97,14 @@ export function Navbar() {
         }
         @media (max-width: 767px) {
           .nav-label-desktop { display: none !important; }
+        }
+        .nav-link-item:hover:not([style*="accent-primary"]) {
+          color: var(--text-primary) !important;
+          background: rgba(255, 255, 255, 0.04) !important;
+        }
+        .nav-link-item:active {
+          transform: scale(0.96);
+          transition-duration: 80ms;
         }
       `}</style>
     </div>
