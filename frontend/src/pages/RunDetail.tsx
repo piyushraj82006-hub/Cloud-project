@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft, FileText, GitCompare, Download } from 'lucide-react'
 import { StatusBadge } from '../components/shared/StatusBadge'
 import { formatTime, formatTimestamp, getScoreColor } from '../utils/format'
@@ -27,10 +27,37 @@ const stages = [
   { name: 'Report', timestamp: '08:02:46' },
 ]
 
+/* ─── Skeleton Loading ─── */
+function RunDetailSkeleton() {
+  return (
+    <div className="page-container">
+      <div className="skeleton skeleton-text" style={{ width: 100, height: 14, marginBottom: 'var(--space-6)' }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+        <div className="skeleton skeleton-heading" style={{ width: 140, height: 24, marginBottom: 0 }} />
+        <div className="skeleton skeleton-pill" style={{ width: 64, height: 22, borderRadius: 9999 }} />
+      </div>
+      <div className="skeleton skeleton-text" style={{ width: '50%', marginBottom: 'var(--space-6)' }} />
+      <div className="skeleton-card" style={{ height: 200, marginBottom: 'var(--space-6)' }} />
+      <div className="skeleton-card" style={{ height: 120, marginBottom: 'var(--space-6)' }} />
+      <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+        <div className="skeleton skeleton-pill" style={{ width: 140, height: 36 }} />
+        <div className="skeleton skeleton-pill" style={{ width: 140, height: 36 }} />
+      </div>
+    </div>
+  )
+}
+
 export default function RunDetail() {
-  const run = mockRun
+  const [loading, setLoading] = useState(true)
   const [generatingPdf, setGeneratingPdf] = useState(false)
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800)
+    return () => clearTimeout(timer)
+  }, [])
+
+  const run = mockRun
 
   const handleGeneratePDF = async () => {
     setGeneratingPdf(true)
@@ -50,6 +77,8 @@ export default function RunDetail() {
     }
   }
 
+  if (loading) return <RunDetailSkeleton />
+
   return (
     <div className="page-container">
       {/* Back link */}
@@ -66,7 +95,7 @@ export default function RunDetail() {
       </Link>
 
       {/* Header */}
-      <div style={{ marginBottom: 'var(--space-6)' }}>
+      <div style={{ marginBottom: 'var(--space-6)' }} className="animate-in">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <h1 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)' }}>
             Run Detail
@@ -83,7 +112,7 @@ export default function RunDetail() {
       </div>
 
       {/* Score Card */}
-      <div className="card" style={{ padding: 'var(--space-8)', marginBottom: 'var(--space-6)' }}>
+      <div className="card animate-in animate-in-delay-1" style={{ padding: 'var(--space-8)', marginBottom: 'var(--space-6)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-8)' }}>
           {/* Left: Score */}
           <div>
@@ -104,7 +133,7 @@ export default function RunDetail() {
           </div>
 
           {/* Right: Metrics */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <MetricRow label="RTO" actual={formatTime(run.rto_seconds)} target={formatTime(run.rto_target)} ok={run.rto_seconds <= run.rto_target} />
             <MetricRow label="RPO" actual={formatTime(run.rpo_seconds)} target={formatTime(run.rpo_target)} ok={run.rpo_seconds <= run.rpo_target} />
             <MetricRow label="TARGET" actual={run.target_resource} target="" ok={true} />
@@ -114,7 +143,7 @@ export default function RunDetail() {
       </div>
 
       {/* Stage Timeline */}
-      <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
+      <div className="card animate-in animate-in-delay-2" style={{ marginBottom: 'var(--space-6)' }}>
         <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 'var(--space-5)' }}>
           STAGE TIMELINE
         </h3>
@@ -172,7 +201,7 @@ export default function RunDetail() {
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+      <div className="animate-in animate-in-delay-3" style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
         <Link to={`/compare?a=${run.run_id}`} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <GitCompare size={14} />
           Compare with...
@@ -224,7 +253,7 @@ export default function RunDetail() {
 
 function MetricRow({ label, actual, target, ok }: { label: string; actual: string; target: string; ok: boolean }) {
   return (
-    <div style={{
+    <div className="stagger-child card-interactive" style={{
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
@@ -244,8 +273,25 @@ function MetricRow({ label, actual, target, ok }: { label: string; actual: strin
             (target: {target})
           </span>
         )}
-        <span style={{ color: ok ? 'var(--status-pass)' : 'var(--status-fail)', fontSize: 14 }}>
-          {ok ? '✓' : '✗'}
+        <span style={{
+          width: 18,
+          height: 18,
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: ok ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)',
+        }}>
+          {ok ? (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-pass)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-fail)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          )}
         </span>
       </div>
     </div>

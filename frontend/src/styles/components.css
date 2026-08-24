@@ -265,6 +265,37 @@
   animation: pulseGlowFail 1.5s ease-in-out infinite;
 }
 
+/* ─── Form Inputs ─── */
+.form-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14;
+  font-family: var(--font-primary);
+  outline: none;
+  transition: border-color 150ms var(--ease-out-expo);
+}
+
+.form-input:focus {
+  border-color: var(--accent-primary);
+}
+
+.form-input-mono {
+  font-family: var(--font-mono);
+}
+
+/* ─── Table Row Hover ─── */
+.table-row-interactive {
+  transition: background var(--transition-fast);
+}
+
+.table-row-interactive:hover {
+  background: var(--bg-hover);
+}
+
 /* ─── Tooltip ─── */
 .tooltip {
   position: relative;

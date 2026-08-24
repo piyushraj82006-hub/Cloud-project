@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { StatusBadge } from '../components/shared/StatusBadge'
 import { formatTime, getScoreColor } from '../utils/format'
@@ -11,10 +11,35 @@ const mockRuns: TestRun[] = [
   { run_id: 'run-m3n4o5p6', timestamp: '2026-08-01T08:00:00Z', fault_type: 'ec2-termination', target_resource: 'i-0jkl012', rto_seconds: 120, rpo_seconds: 40, resilience_score: 88, status: 'Passed', rto_target: 300, rpo_target: 60, report_s3_key: '' },
 ]
 
+/* ─── Skeleton Loading ─── */
+function CompareSkeleton() {
+  return (
+    <div className="page-container">
+      <div className="skeleton skeleton-text" style={{ width: 120, height: 14, borderRadius: 4, marginBottom: 'var(--space-6)' }} />
+      <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)', alignItems: 'center' }}>
+        <div className="skeleton skeleton-pill" style={{ flex: 1, height: 36 }} />
+        <div className="skeleton skeleton-text" style={{ width: 20, height: 14 }} />
+        <div className="skeleton skeleton-pill" style={{ flex: 1, height: 36 }} />
+      </div>
+      <div className="skeleton-card" style={{ padding: 0 }}>
+        {[1, 2, 3, 4, 5, 6].map(i => (
+          <div key={i} className="skeleton" style={{ height: 48, borderBottom: i < 6 ? '1px solid var(--border-primary)' : 'none' }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Compare() {
   const [searchParams] = useSearchParams()
+  const [loading, setLoading] = useState(true)
   const [runA, setRunA] = useState<string>(searchParams.get('a') || mockRuns[0].run_id)
   const [runB, setRunB] = useState<string>(searchParams.get('b') || mockRuns[1].run_id)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 700)
+    return () => clearTimeout(timer)
+  }, [])
 
   const selectedA = mockRuns.find(r => r.run_id === runA) || mockRuns[0]
   const selectedB = mockRuns.find(r => r.run_id === runB) || mockRuns[1]
@@ -24,30 +49,24 @@ export default function Compare() {
   const rtoDelta = selectedB.rto_seconds - selectedA.rto_seconds
   const rpoDelta = selectedB.rpo_seconds - selectedA.rpo_seconds
 
+  if (loading) return <CompareSkeleton />
+
   return (
     <div className="page-container">
       {/* Header */}
-      <div style={{ marginBottom: 'var(--space-6)' }}>
+      <div style={{ marginBottom: 'var(--space-6)' }} className="animate-in">
         <h1 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
           Compare Runs
         </h1>
       </div>
 
       {/* Selectors */}
-      <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)', alignItems: 'center' }} className="animate-in animate-in-delay-1">
         <select
           value={runA}
           onChange={e => setRunA(e.target.value)}
-          style={{
-            flex: 1,
-            background: 'var(--bg-input)',
-            border: '1px solid var(--border-primary)',
-            color: 'var(--text-primary)',
-            padding: '8px 12px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: 13,
-            fontFamily: 'var(--font-mono)',
-          }}
+          className="select-input"
+          style={{ flex: 1, fontFamily: 'var(--font-mono)', fontSize: 13 }}
         >
           {mockRuns.map(r => (
             <option key={r.run_id} value={r.run_id}>{r.run_id} — {r.status}</option>
@@ -59,16 +78,8 @@ export default function Compare() {
         <select
           value={runB}
           onChange={e => setRunB(e.target.value)}
-          style={{
-            flex: 1,
-            background: 'var(--bg-input)',
-            border: '1px solid var(--border-primary)',
-            color: 'var(--text-primary)',
-            padding: '8px 12px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: 13,
-            fontFamily: 'var(--font-mono)',
-          }}
+          className="select-input"
+          style={{ flex: 1, fontFamily: 'var(--font-mono)', fontSize: 13 }}
         >
           {mockRuns.map(r => (
             <option key={r.run_id} value={r.run_id}>{r.run_id} — {r.status}</option>
@@ -77,7 +88,7 @@ export default function Compare() {
       </div>
 
       {/* Comparison Table */}
-      <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 'var(--space-6)' }}>
+      <div className="card animate-in animate-in-delay-2" style={{ padding: 0, overflow: 'hidden', marginBottom: 'var(--space-6)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
@@ -179,11 +190,11 @@ export default function Compare() {
       </div>
 
       {/* Delta Summary */}
-      <div className="card">
+      <div className="card animate-in animate-in-delay-3">
         <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
           DELTA SUMMARY
         </h3>
-        <div style={{ borderTop: '1px solid var(--border-muted)', paddingTop: 'var(--space-4)' }}>
+        <div className="stagger-children" style={{ borderTop: '1px solid var(--border-muted)', paddingTop: 'var(--space-4)' }}>
           <DeltaItem
             text={`Score ${scoreDelta >= 0 ? 'improved' : 'regressed'} by ${Math.abs(scoreDelta)} points`}
             improved={scoreDelta > 0}
@@ -208,6 +219,23 @@ export default function Compare() {
           )}
         </div>
       </div>
+
+      <style>{`
+        .select-input {
+          background: var(--bg-input);
+          border: 1px solid var(--border-primary);
+          color: var(--text-primary);
+          padding: 8px 12px;
+          border-radius: var(--radius-sm);
+          font-size: 13;
+          font-family: var(--font-primary);
+          transition: border-color 150ms var(--ease-out-expo);
+        }
+        .select-input:focus {
+          outline: none;
+          border-color: var(--accent-primary);
+        }
+      `}</style>
     </div>
   )
 }
@@ -231,7 +259,7 @@ function CompareRow({
   const degraded = inverse ? delta > 0 : delta < 0
 
   return (
-    <tr>
+    <tr className="table-row-interactive">
       <td style={{
         padding: '12px 16px',
         borderBottom: '1px solid var(--border-muted)',
@@ -270,18 +298,13 @@ function CompareRow({
 
 function DeltaItem({ text, improved }: { text: string; improved: boolean }) {
   return (
-    <div style={{
+    <div className="stagger-child" style={{
       display: 'flex',
       alignItems: 'center',
       gap: 8,
       padding: '8px 0',
     }}>
-      <span style={{
-        width: 6,
-        height: 6,
-        borderRadius: '50%',
-        background: improved ? 'var(--status-pass)' : 'var(--status-fail)',
-      }} />
+      <span className={`status-dot ${improved ? 'status-dot-live' : 'status-dot-fail'}`} />
       <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
         {text}
       </span>

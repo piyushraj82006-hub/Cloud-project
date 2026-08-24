@@ -1,12 +1,50 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Save, Bell, Clock } from 'lucide-react'
 
+/* ─── Skeleton Loading ─── */
+function SettingsSkeleton() {
+  return (
+    <div className="page-container" style={{ maxWidth: 800, margin: '0 auto' }}>
+      <div className="skeleton skeleton-text" style={{ width: 80, height: 14, borderRadius: 4, marginBottom: 'var(--space-8)' }} />
+      <div className="skeleton-card" style={{ marginBottom: 'var(--space-6)' }}>
+        <div className="skeleton skeleton-text" style={{ width: 100, height: 10, marginBottom: 20 }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+          {[1, 2, 3].map(i => (
+            <div key={i}>
+              <div className="skeleton skeleton-text" style={{ width: 80, height: 10, marginBottom: 8 }} />
+              <div className="skeleton skeleton-pill" style={{ height: 36 }} />
+            </div>
+          ))}
+        </div>
+        <div className="skeleton skeleton-pill" style={{ width: 120, height: 36 }} />
+      </div>
+      <div className="skeleton-card" style={{ marginBottom: 'var(--space-6)' }}>
+        <div className="skeleton skeleton-text" style={{ width: 80, height: 10, marginBottom: 20 }} />
+        <div className="skeleton skeleton-pill" style={{ height: 36, marginBottom: 12 }} />
+        <div className="skeleton skeleton-pill" style={{ height: 36 }} />
+      </div>
+      <div className="skeleton-card">
+        <div className="skeleton skeleton-text" style={{ width: 80, height: 10, marginBottom: 16 }} />
+        {[1, 2, 3].map(i => (
+          <div key={i} className="skeleton skeleton-metric" style={{ marginBottom: i < 3 ? 8 : 0 }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Settings() {
+  const [loading, setLoading] = useState(true)
   const [rtoTarget, setRtoTarget] = useState('300')
   const [rpoTarget, setRpoTarget] = useState('60')
   const [scoreThreshold, setScoreThreshold] = useState('70')
   const [alertEmail, setAlertEmail] = useState('admin@example.com')
   const [schedule, setSchedule] = useState('weekly-mon-8am')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 700)
+    return () => clearTimeout(timer)
+  }, [])
 
   const alertHistory = [
     { date: 'Aug 15', reason: 'RTO exceeded target (8m 12s > 5m)', severity: 'error' },
@@ -14,17 +52,19 @@ export default function Settings() {
     { date: 'Jul 18', reason: 'RPO exceeded target (55s > 60s threshold close)', severity: 'info' },
   ]
 
+  if (loading) return <SettingsSkeleton />
+
   return (
     <div className="page-container" style={{ maxWidth: 800, margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ marginBottom: 'var(--space-8)' }}>
+      <div style={{ marginBottom: 'var(--space-8)' }} className="animate-in">
         <h1 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
           Settings
         </h1>
       </div>
 
       {/* Thresholds */}
-      <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
+      <div className="card animate-in animate-in-delay-1" style={{ marginBottom: 'var(--space-6)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-5)' }}>
           <span style={{ color: 'var(--accent-primary)' }}><Save size={14} /></span>
           <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
@@ -41,16 +81,7 @@ export default function Settings() {
               type="number"
               value={rtoTarget}
               onChange={e => setRtoTarget(e.target.value)}
-              style={{
-                width: '100%',
-                background: 'var(--bg-input)',
-                border: '1px solid var(--border-primary)',
-                color: 'var(--text-primary)',
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 14,
-                fontFamily: 'var(--font-mono)',
-              }}
+              className="form-input form-input-mono"
             />
           </div>
           <div>
@@ -61,16 +92,7 @@ export default function Settings() {
               type="number"
               value={rpoTarget}
               onChange={e => setRpoTarget(e.target.value)}
-              style={{
-                width: '100%',
-                background: 'var(--bg-input)',
-                border: '1px solid var(--border-primary)',
-                color: 'var(--text-primary)',
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 14,
-                fontFamily: 'var(--font-mono)',
-              }}
+              className="form-input form-input-mono"
             />
           </div>
           <div>
@@ -81,16 +103,7 @@ export default function Settings() {
               type="number"
               value={scoreThreshold}
               onChange={e => setScoreThreshold(e.target.value)}
-              style={{
-                width: '100%',
-                background: 'var(--bg-input)',
-                border: '1px solid var(--border-primary)',
-                color: 'var(--text-primary)',
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 14,
-                fontFamily: 'var(--font-mono)',
-              }}
+              className="form-input form-input-mono"
             />
           </div>
         </div>
@@ -102,7 +115,7 @@ export default function Settings() {
       </div>
 
       {/* Alerts */}
-      <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
+      <div className="card animate-in animate-in-delay-2" style={{ marginBottom: 'var(--space-6)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-5)' }}>
           <span style={{ color: 'var(--accent-primary)' }}><Bell size={14} /></span>
           <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
@@ -134,16 +147,7 @@ export default function Settings() {
             type="email"
             value={alertEmail}
             onChange={e => setAlertEmail(e.target.value)}
-            style={{
-              width: '100%',
-              background: 'var(--bg-input)',
-              border: '1px solid var(--border-primary)',
-              color: 'var(--text-primary)',
-              padding: '8px 12px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: 14,
-              fontFamily: 'var(--font-primary)',
-            }}
+            className="form-input"
           />
         </div>
 
@@ -154,7 +158,7 @@ export default function Settings() {
       </div>
 
       {/* Schedule */}
-      <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
+      <div className="card animate-in animate-in-delay-3" style={{ marginBottom: 'var(--space-6)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-5)' }}>
           <span style={{ color: 'var(--accent-primary)' }}><Clock size={14} /></span>
           <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
@@ -165,17 +169,8 @@ export default function Settings() {
         <select
           value={schedule}
           onChange={e => setSchedule(e.target.value)}
-          style={{
-            width: '100%',
-            background: 'var(--bg-input)',
-            border: '1px solid var(--border-primary)',
-            color: 'var(--text-primary)',
-            padding: '8px 12px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: 13,
-            fontFamily: 'var(--font-primary)',
-            marginBottom: 'var(--space-4)',
-          }}
+          className="form-input"
+          style={{ marginBottom: 'var(--space-4)' }}
         >
           <option value="weekly-mon-8am">Weekly (Monday 08:00 UTC)</option>
           <option value="daily-8am">Daily (08:00 UTC)</option>
@@ -189,13 +184,13 @@ export default function Settings() {
       </div>
 
       {/* Alert History */}
-      <div className="card">
+      <div className="card animate-in animate-in-delay-4">
         <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
           ALERT HISTORY
         </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+        <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           {alertHistory.map((alert, i) => (
-            <div key={i} style={{
+            <div key={i} className="stagger-child card-interactive" style={{
               display: 'flex',
               alignItems: 'center',
               gap: 'var(--space-3)',
@@ -203,12 +198,16 @@ export default function Settings() {
               background: 'var(--bg-secondary)',
               borderRadius: 'var(--radius-sm)',
             }}>
-              <span style={{
+              <span className={`status-dot ${
+                alert.severity === 'error' ? 'status-dot-fail' :
+                alert.severity === 'warning' ? '' :
+                ''
+              }`} style={{
+                background: alert.severity === 'error' ? 'var(--status-fail)' :
+                           alert.severity === 'warning' ? 'var(--status-warn)' :
+                           'var(--status-info)',
                 width: 6,
                 height: 6,
-                borderRadius: '50%',
-                background: alert.severity === 'error' ? 'var(--status-fail)' : alert.severity === 'warning' ? 'var(--status-warn)' : 'var(--status-info)',
-                flexShrink: 0,
               }} />
               <span style={{ fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', minWidth: 60 }}>
                 {alert.date}

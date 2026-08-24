@@ -1,29 +1,55 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Play, Globe, Zap, Search, BarChart3 } from 'lucide-react'
 
+/* ─── Skeleton Loading ─── */
+function NewAuditSkeleton() {
+  return (
+    <div className="page-container" style={{ maxWidth: 600, margin: '0 auto' }}>
+      <div style={{ marginBottom: 'var(--space-8)' }}>
+        <div className="skeleton skeleton-text" style={{ width: 90, height: 14, borderRadius: 4, marginBottom: 8 }} />
+        <div className="skeleton skeleton-text" style={{ width: '60%', height: 14 }} />
+      </div>
+      <div className="skeleton-card">
+        <div className="skeleton skeleton-text" style={{ width: 100, height: 10, marginBottom: 16 }} />
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="skeleton skeleton-metric" style={{ marginBottom: i < 4 ? 12 : 0 }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function NewAudit() {
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
   const [auditType, setAuditType] = useState<'dr-test' | 'external' | 'seo' | 'competitor'>('dr-test')
   const [targetUrl, setTargetUrl] = useState('')
   const [industry, setIndustry] = useState('')
   const [city, setCity] = useState('')
   const [competitorUrls, setCompetitorUrls] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleSubmit = async () => {
-    setLoading(true)
+    setSubmitting(true)
     // Simulate API call
     setTimeout(() => {
-      setLoading(false)
+      setSubmitting(false)
       navigate('/runs/run-new123')
     }, 2000)
   }
 
+  if (loading) return <NewAuditSkeleton />
+
   return (
     <div className="page-container" style={{ maxWidth: 600, margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ marginBottom: 'var(--space-8)' }}>
+      <div style={{ marginBottom: 'var(--space-8)' }} className="animate-in">
         <h1 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
           New Audit
         </h1>
@@ -33,128 +59,52 @@ export default function NewAudit() {
       </div>
 
       {/* Audit Type Toggle */}
-      <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
+      <div className="card animate-in animate-in-delay-1" style={{ marginBottom: 'var(--space-6)' }}>
         <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
           AUDIT TYPE
         </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-3)',
-              padding: 'var(--space-4)',
-              background: auditType === 'dr-test' ? 'var(--accent-muted)' : 'var(--bg-secondary)',
-              border: `1px solid ${auditType === 'dr-test' ? 'var(--accent-primary)' : 'var(--border-primary)'}`,
-              borderRadius: 'var(--radius-md)',
-              cursor: 'pointer',
-              transition: 'all var(--transition-fast)',
-            }}
-          >
-            <input
-              type="radio"
-              name="auditType"
-              value="dr-test"
-              checked={auditType === 'dr-test'}
-              onChange={() => setAuditType('dr-test')}
-              style={{ accentColor: 'var(--accent-primary)' }}
-            />
-            <Zap size={16} style={{ color: 'var(--accent-primary)' }} />
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>Full DR Test (Fault Injection)</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Terminates an EC2 instance and measures recovery</div>
-            </div>
-          </label>
-
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-3)',
-              padding: 'var(--space-4)',
-              background: auditType === 'external' ? 'var(--accent-muted)' : 'var(--bg-secondary)',
-              border: `1px solid ${auditType === 'external' ? 'var(--accent-primary)' : 'var(--border-primary)'}`,
-              borderRadius: 'var(--radius-md)',
-              cursor: 'pointer',
-              transition: 'all var(--transition-fast)',
-            }}
-          >
-            <input
-              type="radio"
-              name="auditType"
-              value="external"
-              checked={auditType === 'external'}
-              onChange={() => setAuditType('external')}
-              style={{ accentColor: 'var(--accent-primary)' }}
-            />
-            <Globe size={16} style={{ color: 'var(--accent-primary)' }} />
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>External Site Audit (Health Check Only)</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Non-intrusive checks: HTTPS, DNS, response time</div>
-            </div>
-          </label>
-
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-3)',
-              padding: 'var(--space-4)',
-              background: auditType === 'seo' ? 'var(--accent-muted)' : 'var(--bg-secondary)',
-              border: `1px solid ${auditType === 'seo' ? 'var(--accent-primary)' : 'var(--border-primary)'}`,
-              borderRadius: 'var(--radius-md)',
-              cursor: 'pointer',
-              transition: 'all var(--transition-fast)',
-            }}
-          >
-            <input
-              type="radio"
-              name="auditType"
-              value="seo"
-              checked={auditType === 'seo'}
-              onChange={() => setAuditType('seo')}
-              style={{ accentColor: 'var(--accent-primary)' }}
-            />
-            <Search size={16} style={{ color: 'var(--accent-primary)' }} />
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>SEO Audit Report</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Analyze meta tags, headings, images, performance, social tags</div>
-            </div>
-          </label>
-
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-3)',
-              padding: 'var(--space-4)',
-              background: auditType === 'competitor' ? 'var(--accent-muted)' : 'var(--bg-secondary)',
-              border: `1px solid ${auditType === 'competitor' ? 'var(--accent-primary)' : 'var(--border-primary)'}`,
-              borderRadius: 'var(--radius-md)',
-              cursor: 'pointer',
-              transition: 'all var(--transition-fast)',
-            }}
-          >
-            <input
-              type="radio"
-              name="auditType"
-              value="competitor"
-              checked={auditType === 'competitor'}
-              onChange={() => setAuditType('competitor')}
-              style={{ accentColor: 'var(--accent-primary)' }}
-            />
-            <BarChart3 size={16} style={{ color: 'var(--accent-primary)' }} />
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>Competitive Analysis</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Compare against competitors, find gaps, get strategic opportunities</div>
-            </div>
-          </label>
+        <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          {([
+            { value: 'dr-test' as const, icon: Zap, title: 'Full DR Test (Fault Injection)', desc: 'Terminates an EC2 instance and measures recovery' },
+            { value: 'external' as const, icon: Globe, title: 'External Site Audit (Health Check Only)', desc: 'Non-intrusive checks: HTTPS, DNS, response time' },
+            { value: 'seo' as const, icon: Search, title: 'SEO Audit Report', desc: 'Analyze meta tags, headings, images, performance, social tags' },
+            { value: 'competitor' as const, icon: BarChart3, title: 'Competitive Analysis', desc: 'Compare against competitors, find gaps, get strategic opportunities' },
+          ]).map(opt => (
+            <label
+              key={opt.value}
+              className="stagger-child card-interactive"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-3)',
+                padding: 'var(--space-4)',
+                background: auditType === opt.value ? 'var(--accent-muted)' : 'var(--bg-secondary)',
+                border: `1px solid ${auditType === opt.value ? 'var(--accent-primary)' : 'var(--border-primary)'}`,
+                borderRadius: 'var(--radius-md)',
+                cursor: 'pointer',
+              }}
+            >
+              <input
+                type="radio"
+                name="auditType"
+                value={opt.value}
+                checked={auditType === opt.value}
+                onChange={() => setAuditType(opt.value)}
+                style={{ accentColor: 'var(--accent-primary)' }}
+              />
+              <opt.icon size={16} style={{ color: 'var(--accent-primary)' }} />
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>{opt.title}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{opt.desc}</div>
+              </div>
+            </label>
+          ))}
         </div>
       </div>
 
       {/* Target URL (for external / seo / competitor) */}
       {(auditType === 'external' || auditType === 'seo' || auditType === 'competitor') && (
-        <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
+        <div className="card animate-in" style={{ marginBottom: 'var(--space-6)' }}>
           <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
             TARGET URL
           </h3>
@@ -163,19 +113,7 @@ export default function NewAudit() {
             value={targetUrl}
             onChange={e => setTargetUrl(e.target.value)}
             placeholder="https://example.com"
-            style={{
-              width: '100%',
-              background: 'var(--bg-input)',
-              border: '1px solid var(--border-primary)',
-              color: 'var(--text-primary)',
-              padding: '10px 14px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: 14,
-              fontFamily: 'var(--font-mono)',
-              outline: 'none',
-            }}
-            onFocus={e => (e.target.style.borderColor = 'var(--accent-primary)')}
-            onBlur={e => (e.target.style.borderColor = 'var(--border-primary)')}
+            className="form-input form-input-mono"
           />
         </div>
       )}
@@ -183,7 +121,7 @@ export default function NewAudit() {
       {/* Competitor-specific fields */}
       {auditType === 'competitor' && (
         <>
-          <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
+          <div className="card animate-in" style={{ marginBottom: 'var(--space-6)' }}>
             <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
               BUSINESS INFO
             </h3>
@@ -197,16 +135,7 @@ export default function NewAudit() {
                   value={industry}
                   onChange={e => setIndustry(e.target.value)}
                   placeholder="e.g. plumbing, HVAC, roofing"
-                  style={{
-                    width: '100%',
-                    background: 'var(--bg-input)',
-                    border: '1px solid var(--border-primary)',
-                    color: 'var(--text-primary)',
-                    padding: '10px 14px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 14,
-                    outline: 'none',
-                  }}
+                  className="form-input"
                 />
               </div>
               <div>
@@ -218,22 +147,13 @@ export default function NewAudit() {
                   value={city}
                   onChange={e => setCity(e.target.value)}
                   placeholder="e.g. Austin, Denver, Miami"
-                  style={{
-                    width: '100%',
-                    background: 'var(--bg-input)',
-                    border: '1px solid var(--border-primary)',
-                    color: 'var(--text-primary)',
-                    padding: '10px 14px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 14,
-                    outline: 'none',
-                  }}
+                  className="form-input"
                 />
               </div>
             </div>
           </div>
 
-          <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
+          <div className="card animate-in" style={{ marginBottom: 'var(--space-6)' }}>
             <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 'var(--space-4)' }}>
               COMPETITOR URLs <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
             </h3>
@@ -245,18 +165,8 @@ export default function NewAudit() {
               onChange={e => setCompetitorUrls(e.target.value)}
               placeholder={'Auto-discover from industry + city\n\nOr paste competitor URLs:\nhttps://competitor1.com\nhttps://competitor2.com'}
               rows={5}
-              style={{
-                width: '100%',
-                background: 'var(--bg-input)',
-                border: '1px solid var(--border-primary)',
-                color: 'var(--text-primary)',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 13,
-                fontFamily: 'var(--font-mono)',
-                outline: 'none',
-                resize: 'vertical',
-              }}
+              className="form-input form-input-mono"
+              style={{ resize: 'vertical', fontSize: 13 }}
             />
           </div>
         </>
@@ -265,7 +175,7 @@ export default function NewAudit() {
       {/* Submit */}
       <button
         onClick={handleSubmit}
-        disabled={loading || ((auditType === 'external' || auditType === 'seo' || auditType === 'competitor') && !targetUrl)}
+        disabled={submitting || ((auditType === 'external' || auditType === 'seo' || auditType === 'competitor') && !targetUrl)}
         className="btn btn-primary"
         style={{
           width: '100%',
@@ -275,11 +185,11 @@ export default function NewAudit() {
           gap: 8,
           padding: '12px 24px',
           fontSize: 14,
-          opacity: loading || ((auditType === 'external' || auditType === 'seo' || auditType === 'competitor') && !targetUrl) ? 0.5 : 1,
-          cursor: loading || ((auditType === 'external' || auditType === 'seo' || auditType === 'competitor') && !targetUrl) ? 'not-allowed' : 'pointer',
+          opacity: submitting || ((auditType === 'external' || auditType === 'seo' || auditType === 'competitor') && !targetUrl) ? 0.5 : 1,
+          cursor: submitting || ((auditType === 'external' || auditType === 'seo' || auditType === 'competitor') && !targetUrl) ? 'not-allowed' : 'pointer',
         }}
       >
-        {loading ? (
+        {submitting ? (
           <>
             <div style={{
               width: 14,
