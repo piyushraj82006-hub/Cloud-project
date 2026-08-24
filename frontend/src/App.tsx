@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { ThemeProvider } from './contexts/ThemeContext'
 import { Navbar } from './components/Layout/Navbar'
 import { Footer } from './components/Layout/Footer'
 
@@ -55,15 +56,17 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <Router>
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Navbar />
-        <main style={{ flex: 1, padding: '24px 0' }}>
-          <AnimatedRoutes />
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <Navbar />
+          <main style={{ flex: 1, padding: '24px 0' }}>
+            <AnimatedRoutes />
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </ThemeProvider>
   )
 }
 

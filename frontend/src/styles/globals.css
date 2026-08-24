@@ -32,6 +32,16 @@ body {
     radial-gradient(ellipse 50% 50% at 50% 100%, rgba(16, 185, 129, 0.02) 0%, transparent 50%),
     var(--bg-primary);
   background-attachment: fixed;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(5, 150, 105, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(79, 70, 229, 0.02) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(5, 150, 105, 0.015) 0%, transparent 50%),
+    var(--bg-primary);
+  background-attachment: fixed;
 }
 
 /* ─── Grain Overlay (fixed, pointer-events-none) ─── */
@@ -73,12 +83,12 @@ code, pre, .mono {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(128, 128, 128, 0.25);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(128, 128, 128, 0.4);
 }
 
 /* ─── Selection ─── */

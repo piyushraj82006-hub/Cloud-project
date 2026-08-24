@@ -85,3 +85,52 @@
   --glass-border: 1px solid rgba(255, 255, 255, 0.06);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
+
+/* ─── Light Theme ─── */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #f0f1f3;
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --bg-elevated: rgba(255, 255, 255, 0.9);
+  --bg-input: #ffffff;
+  --bg-hover: rgba(0, 0, 0, 0.03);
+  --bg-glass: rgba(255, 255, 255, 0.6);
+  --bg-glass-hover: rgba(255, 255, 255, 0.85);
+
+  /* Borders */
+  --border-primary: rgba(0, 0, 0, 0.08);
+  --border-muted: rgba(0, 0, 0, 0.05);
+  --border-glass: rgba(0, 0, 0, 0.06);
+
+  /* Text */
+  --text-primary: #1a1a2e;
+  --text-secondary: #5a5a6e;
+  --text-muted: #8a8a9a;
+  --text-code: #555568;
+
+  /* Accent (same teal, slightly adjusted for light bg) */
+  --accent-primary: #059669;
+  --accent-hover: #10b981;
+  --accent-muted: rgba(5, 150, 105, 0.08);
+  --accent-glow: rgba(5, 150, 105, 0.12);
+  --accent-subtle: rgba(5, 150, 105, 0.04);
+
+  /* Status */
+  --status-pass: #059669;
+  --status-fail: #e11d48;
+  --status-warn: #d97706;
+  --status-info: #4f46e5;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 40px rgba(5, 150, 105, 0.06);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+  /* Glass */
+  --glass-blur: blur(24px) saturate(1.2);
+  --glass-border: 1px solid rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}

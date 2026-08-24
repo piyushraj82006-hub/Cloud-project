@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Shield, Activity, GitCompare, Settings, Users } from 'lucide-react'
+import { Shield, Activity, GitCompare, Settings, Users, Sun, Moon } from 'lucide-react'
+import { useTheme } from '../../contexts/ThemeContext'
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: Activity },
@@ -11,6 +12,7 @@ const navItems = [
 
 export function Navbar() {
   const location = useLocation()
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <div style={{
@@ -21,17 +23,12 @@ export function Navbar() {
       justifyContent: 'center',
       padding: '0 24px',
     }}>
-      <nav style={{
+      <nav className="navbar-glass" style={{
         display: 'flex',
         alignItems: 'center',
         gap: 4,
         padding: '6px 8px',
-        background: 'rgba(10, 10, 14, 0.8)',
-        backdropFilter: 'blur(24px) saturate(1.4)',
-        WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
         borderRadius: 9999,
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
       }}>
         {/* Logo */}
         <Link to="/" style={{
@@ -53,10 +50,9 @@ export function Navbar() {
         </Link>
 
         {/* Divider */}
-        <div style={{
+        <div className="navbar-divider" style={{
           width: 1,
           height: 20,
-          background: 'rgba(255, 255, 255, 0.06)',
           marginRight: 4,
         }} />
 
@@ -89,6 +85,36 @@ export function Navbar() {
             </Link>
           )
         })}
+
+        {/* Divider */}
+        <div className="navbar-divider" style={{
+          width: 1,
+          height: 20,
+          marginLeft: 4,
+        }} />
+
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="theme-toggle"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 32,
+            height: 32,
+            borderRadius: 9999,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            transition: 'all 150ms cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? <Sun size={14} strokeWidth={1.5} /> : <Moon size={14} strokeWidth={1.5} />}
+        </button>
       </nav>
 
       <style>{`
@@ -105,6 +131,14 @@ export function Navbar() {
         .nav-link-item:active {
           transform: scale(0.96);
           transition-duration: 80ms;
+        }
+        .theme-toggle:hover {
+          color: var(--text-primary) !important;
+          background: rgba(255, 255, 255, 0.04) !important;
+        }
+        .theme-toggle:active {
+          transform: scale(0.9) rotate(15deg);
+          transition-duration: 100ms;
         }
       `}</style>
     </div>

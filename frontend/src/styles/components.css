@@ -325,6 +325,31 @@
   transform: translateX(-50%) translateY(0);
 }
 
+/* ─── Navbar Glass ─── */
+.navbar-glass {
+  background: rgba(10, 10, 14, 0.8);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+[data-theme="light"] .navbar-glass {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.navbar-divider {
+  background: rgba(255, 255, 255, 0.06);
+  transition: background 0.3s ease;
+}
+
+[data-theme="light"] .navbar-divider {
+  background: rgba(0, 0, 0, 0.06);
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
   .btn {
