@@ -305,6 +305,22 @@ code, pre, .mono {
 .stagger-children .stagger-child:nth-child(7) { animation-delay: 0.35s; }
 .stagger-children .stagger-child:nth-child(8) { animation-delay: 0.4s; }
 
+/* ─── Page Transition ─── */
+.page-transition {
+  animation: pageEnter 0.35s var(--ease-out-expo) forwards;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ─── Gradient Text ─── */
 .gradient-text {
   background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%);
