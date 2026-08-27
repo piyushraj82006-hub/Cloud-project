@@ -416,8 +416,8 @@ resource "aws_iam_role_policy" "step_functions" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "lambda:InvokeFunction"
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
         Resource = "*"
       },
       {
@@ -463,8 +463,8 @@ resource "aws_iam_role_policy" "fis_execution" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "ec2:TerminateInstances"
+        Effect   = "Allow"
+        Action   = "ec2:TerminateInstances"
         Resource = "arn:aws:ec2:*:*:instance/*"
         Condition = {
           StringEquals = {
@@ -579,6 +579,20 @@ resource "aws_iam_role_policy" "seo_report_lambda" {
       {
         Effect = "Allow"
         Action = [
+          "lambda:InvokeFunction",
+        ]
+        Resource = "arn:aws:lambda:${var.aws_region}:${var.account_id}:function:${local.name_prefix}-*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+        ]
+        Resource = "arn:aws:ssm:${var.aws_region}:${var.account_id}:parameter/${local.name_prefix}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
@@ -683,6 +697,13 @@ resource "aws_iam_role_policy" "pdf_report_lambda" {
       {
         Effect = "Allow"
         Action = [
+          "ssm:GetParameter",
+        ]
+        Resource = "arn:aws:ssm:${var.aws_region}:${var.account_id}:parameter/${local.name_prefix}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
@@ -695,6 +716,57 @@ resource "aws_iam_role_policy" "pdf_report_lambda" {
 
 output "pdf_report_lambda_role_arn" {
   value = aws_iam_role.pdf_report_lambda.arn
+}
+
+# ─── AI Insights Lambda Role ──────────────────────────────────────
+
+resource "aws_iam_role" "ai_insights_lambda" {
+  name = "${local.name_prefix}-ai-insights-lambda-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "ai_insights_lambda" {
+  name = "${local.name_prefix}-ai-insights-lambda-policy"
+  role = aws_iam_role.ai_insights_lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "dynamodb:UpdateItem",
+          "ssm:GetParameter",
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+output "ai_insights_lambda_role_arn" {
+  value = aws_iam_role.ai_insights_lambda.arn
 }
 
 # ─── Client Intake Lambda Role ────────────────────────────────────

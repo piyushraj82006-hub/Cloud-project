@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+    @page {
+        size: A4;
+        margin: 18mm 16mm 22mm 16mm;
+        @bottom-center {
+            content: "CloudGuard DR — Confidential";
+            font-size: 7.5px;
+            color: #666666;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        @bottom-right {
+            content: counter(page) " / " counter(pages);
+            font-size: 7.5px;
+            color: #666666;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+        }
+    }
+    @page cover {
+        margin: 0;
+        @bottom-center { content: none; }
+        @bottom-right { content: none; }
+    }
+    @page toc {
+        @bottom-center { content: none; }
+    }
+    @page weak-points {
+        @bottom-center {
+            content: "⚠ CRITICAL — Review weak points on pages 3–5";
+            font-size: 7px;
+            color: #EF4444;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 600;
+        }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 9.5pt;
+        line-height: 1.55;
+        color: #F5F5F5;
+        background: #0A0A0A;
+    }
+
+    /* ─── Cover Page ─── */
+    .cover {
+        page: cover;
+        width: 210mm;
+        height: 297mm;
+        background: linear-gradient(135deg, #0A0A0A 0%, #111111 40%, #0D1117 100%);
+        color: #F5F5F5;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        page-break-after: always;
+        padding: 40mm;
+    }
+    .cover-logo {
+        font-size: 34pt;
+        font-weight: 700;
+        letter-spacing: -1px;
+        margin-bottom: 6mm;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+    .cover-logo span {
+        color: #22C55E;
+    }
+    .cover-subtitle {
+        font-size: 11pt;
+        color: #A1A1A1;
+        margin-bottom: 18mm;
+        font-weight: 300;
+        letter-spacing: 0.02em;
+    }
+    .cover-report-type {
+        font-size: 18pt;
+        font-weight: 600;
+        margin-bottom: 5mm;
+        color: #F5F5F5;
+    }
+    .cover-client {
+        font-size: 13pt;
+        color: #A1A1A1;
+        margin-bottom: 28mm;
+    }
+    .cover-meta {
+        font-size: 8.5pt;
+        color: #666666;
+        line-height: 2.2;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+    }
+    .cover-bar {
+        width: 50mm;
+        height: 2px;
+        background: #22C55E;
+        margin: 8mm auto;
+    }
+
+    /* ─── Headings ─── */
+    h1 {
+        font-size: 16pt;
+        font-weight: 700;
+        color: #F5F5F5;
+        margin: 7mm 0 3.5mm 0;
+        padding-bottom: 2mm;
+        border-bottom: 2px solid #22C55E;
+        letter-spacing: -0.01em;
+    }
+    h2 {
+        font-size: 12pt;
+        font-weight: 600;
+        color: #F5F5F5;
+        margin: 5mm 0 2.5mm 0;
+    }
+    h3 {
+        font-size: 10pt;
+        font-weight: 600;
+        color: #E0E0E0;
+        margin: 3.5mm 0 2mm 0;
+    }
+    p {
+        margin-bottom: 2.5mm;
+        color: #A1A1A1;
+        font-size: 9.5pt;
+    }
+    strong {
+        color: #F5F5F5;
+    }
+
+    /* ─── Section ─── */
+    .section {
+        page-break-inside: avoid;
+        margin-bottom: 5mm;
+    }
+
+    /* ─── Executive Summary ─── */
+    .exec-summary {
+        background: #111111;
+        border: 1px solid #292929;
+        border-left: 3px solid #2563EB;
+        border-radius: 4px;
+        padding: 5mm;
+        margin: 4mm 0;
+    }
+
+    /* ─── Stat Grid ─── */
+    .stat-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 3mm;
+        margin: 4mm 0;
+    }
+    .stat-card {
+        flex: 1;
+        min-width: 32mm;
+        background: #111111;
+        border: 1px solid #292929;
+        border-radius: 4px;
+        padding: 4mm;
+        text-align: center;
+    }
+    .stat-value {
+        font-size: 18pt;
+        font-weight: 700;
+        color: #F5F5F5;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+    }
+    .stat-value.good { color: #22C55E; }
+    .stat-value.warn { color: #F59E0B; }
+    .stat-value.bad { color: #EF4444; }
+    .stat-value.info { color: #3B82F6; }
+    .stat-label {
+        font-size: 7pt;
+        color: #666666;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-top: 1mm;
+        font-weight: 500;
+    }
+
+    /* ─── Weak Points Banner ─── */
+    .weak-points-banner {
+        background: linear-gradient(135deg, #1C0A0A 0%, #2D0F0F 100%);
+        border: 1px solid #7F1D1D;
+        border-left: 4px solid #EF4444;
+        border-radius: 4px;
+        padding: 5mm;
+        margin: 5mm 0;
+        page-break-inside: avoid;
+        page: weak-points;
+    }
+    .weak-points-banner h2 {
+        color: #EF4444;
+        font-size: 11pt;
+        margin: 0 0 2mm 0;
+        display: flex;
+        align-items: center;
+        gap: 2mm;
+    }
+    .weak-points-banner .weak-count {
+        background: #EF4444;
+        color: white;
+        font-size: 8pt;
+        padding: 1mm 2.5mm;
+        border-radius: 2px;
+        font-weight: 700;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    /* ─── Issue Card (within weak points) ─── */
+    .issue-card {
+        background: #1A0A0A;
+        border: 1px solid #3B1111;
+        border-left: 3px solid #EF4444;
+        border-radius: 3px;
+        padding: 3.5mm;
+        margin: 2.5mm 0;
+        page-break-inside: avoid;
+    }
+    .issue-card.warn {
+        background: #1A1408;
+        border-color: #78350F;
+        border-left-color: #F59E0B;
+    }
+    .issue-card-title {
+        font-size: 9.5pt;
+        font-weight: 600;
+        color: #F5F5F5;
+        margin-bottom: 1.5mm;
+    }
+    .issue-card-detail {
+        font-size: 8.5pt;
+        color: #A1A1A1;
+        line-height: 1.5;
+    }
+    .issue-severity {
+        display: inline-block;
+        font-size: 7pt;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0.8mm 2mm;
+        border-radius: 2px;
+        margin-bottom: 1.5mm;
+    }
+    .severity-critical { background: #7F1D1D; color: #FCA5A5; }
+    .severity-high { background: #92400E; color: #FCD34D; }
+    .severity-medium { background: #78350F; color: #FDE68A; }
+
+    /* ─── Tables ─── */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 3mm 0;
+        font-size: 8.5pt;
+    }
+    th {
+        background: #151515;
+        font-weight: 600;
+        text-align: left;
+        padding: 2.5mm 3mm;
+        border-bottom: 2px solid #292929;
+        font-size: 7pt;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #666666;
+    }
+    td {
+        padding: 2.5mm 3mm;
+        border-bottom: 1px solid #1A1A1A;
+        vertical-align: top;
+        color: #D4D4D4;
+    }
+    tr:nth-child(even) { background: #0D0D0D; }
+    tr:hover { background: #151515; }
+
+    /* Row highlighting for failures */
+    tr.row-fail { background: #1C0A0A !important; }
+    tr.row-fail td { border-bottom-color: #3B1111; }
+    tr.row-warn { background: #1A1408 !important; }
+    tr.row-warn td { border-bottom-color: #78350F; }
+    tr.row-pass { background: #0A1A0A !important; }
+
+    /* ─── Badges ─── */
+    .badge {
+        display: inline-block;
+        padding: 0.8mm 2.5mm;
+        border-radius: 2px;
+        font-size: 7pt;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+    }
+    .badge-pass { background: #052E16; color: #22C55E; }
+    .badge-fail { background: #450A0A; color: #EF4444; }
+    .badge-warn { background: #451A03; color: #F59E0B; }
+    .badge-info { background: #172554; color: #3B82F6; }
+    .badge-high { background: #450A0A; color: #EF4444; }
+    .badge-medium { background: #451A03; color: #F59E0B; }
+    .badge-low { background: #052E16; color: #22C55E; }
+    .badge-critical { background: #7F1D1D; color: #FCA5A5; }
+
+    /* ─── Delta Indicators (Comparison) ─── */
+    .delta-good {
+        color: #22C55E;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        font-weight: 600;
+    }
+    .delta-bad {
+        color: #EF4444;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        font-weight: 600;
+    }
+    .delta-neutral {
+        color: #666666;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    /* ─── Opportunity / Recommendation Card ─── */
+    .opportunity {
+        border: 1px solid #292929;
+        border-left: 3px solid #22C55E;
+        border-radius: 4px;
+        padding: 4mm;
+        margin: 3mm 0;
+        page-break-inside: avoid;
+        background: #0D0D0D;
+    }
+    .opportunity.critical {
+        border-left-color: #EF4444;
+        background: #1A0A0A;
+    }
+    .opportunity.high {
+        border-left-color: #F59E0B;
+        background: #1A1408;
+    }
+    .opportunity h3 {
+        margin: 0 0 1.5mm 0;
+        font-size: 9.5pt;
+    }
+    .opportunity p {
+        font-size: 8.5pt;
+        color: #A1A1A1;
+    }
+    .opportunity ul {
+        margin: 2mm 0 0 4mm;
+        font-size: 8.5pt;
+        color: #A1A1A1;
+    }
+    .opportunity li { margin-bottom: 1mm; }
+
+    /* ─── TOC ─── */
+    .toc {
+        page: toc;
+        page-break-after: always;
+    }
+    .toc h1 { border-bottom-color: #22C55E; }
+    .toc-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 2mm 0;
+        border-bottom: 1px dotted #292929;
+        font-size: 9.5pt;
+        color: #A1A1A1;
+    }
+    .toc-item span:first-child { font-weight: 500; color: #D4D4D4; }
+    .toc-item span:last-child { color: #666666; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+
+    /* ─── Closing ─── */
+    .closing {
+        margin-top: 12mm;
+        padding-top: 4mm;
+        border-top: 2px solid #22C55E;
+        text-align: center;
+        color: #666666;
+        font-size: 8pt;
+    }
+    .closing strong { color: #A1A1A1; }
+
+    /* ─── Utilities ─── */
+    .page-break { page-break-before: always; }
+    .text-muted { color: #666666; }
+    .text-pass { color: #22C55E; }
+    .text-fail { color: #EF4444; }
+    .text-warn { color: #F59E0B; }
+    .mono { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+    </style></head>
+<body>
+
+<!-- Cover Page -->
+<div class="cover">
+    <div class="cover-logo">Cloud<span>Guard</span> DR</div>
+    <div class="cover-subtitle">Automated Resilience & SEO Platform</div>
+    <div class="cover-bar"></div>
+    <div class="cover-report-type">SEO Audit Report</div>
+    <div class="cover-client">https://www.target.com</div>
+    <div class="cover-meta">
+        Generated: 2026-08-24T16:53:20Z<br>
+        Prepared by: CloudGuard DR
+    </div>
+</div>
+
+<!-- Table of Contents -->
+<div class="toc">
+    <h1>Table of Contents</h1>
+    <div class="toc-item"><span>Executive Summary</span><span>2</span></div>
+    <div class="toc-item"><span>⚠ Weak Points</span><span>3</span></div>
+    <div class="toc-item"><span>Technical SEO Audit</span><span>4</span></div>
+    <div class="toc-item"><span>Recommendations</span><span>5</span></div>
+</div>
+
+<!-- Executive Summary -->
+<h1>Executive Summary</h1>
+<div class="exec-summary">
+    <p>This report presents the results of an automated SEO audit for <strong>https://www.target.com</strong>. The analysis covers technical SEO factors, on-page optimization, content structure, and performance metrics.</p>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-value good">71</div>
+        <div class="stat-label">Overall SEO Score</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value warn">11/7</div>
+        <div class="stat-label">Checks Passing</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value bad">2</div>
+        <div class="stat-label">Issues Found</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value mono">3650ms</div>
+        <div class="stat-label">Response Time</div>
+    </div>
+</div>
+
+<!-- Weak Points Section -->
+
+        <div class="weak-points-banner">
+            <h2>⚠ Weak Points Identified <span class="weak-count">2 FAILING</span></h2>
+            <p style="color: #FCA5A5; font-size: 8.5pt; margin-bottom: 2mm;">
+                These checks are failing and require immediate attention to improve your SEO score.
+            </p>
+            
+            <div class="issue-card">
+                <div class="issue-severity severity-medium">medium</div>
+                <div class="issue-card-title">Images & Alt Text</div>
+                <div class="issue-card-detail">
+                    <ul style="margin: 1mm 0 0 4mm; padding: 0; list-style: disc;">
+                        <li>45/45 images missing alt text</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="issue-card">
+                <div class="issue-severity severity-medium">medium</div>
+                <div class="issue-card-title">Open Graph Tags</div>
+                <div class="issue-card-detail">
+                    <ul style="margin: 1mm 0 0 4mm; padding: 0; list-style: disc;">
+                        <li>Missing: og:image</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+<!-- Technical SEO Audit -->
+<h1 class="page-break">Technical SEO Audit</h1>
+<p>Each check is rated as <span class="badge badge-pass">PASS</span> or <span class="badge badge-fail">FAIL</span> based on industry best practices.</p>
+
+<table>
+    <thead>
+        <tr><th>Check</th><th>Status</th><th>Details</th></tr>
+    </thead>
+    <tbody>
+        
+        <tr class="row-pass">
+            <td>Page Title</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-pass">
+            <td>Meta Description</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-pass">
+            <td>Heading Structure</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-fail">
+            <td>Images & Alt Text</td>
+            <td><span class="badge badge-fail">FAIL</span></td>
+            <td style="color: #FCA5A5;">45/45 images missing alt text</td>
+        </tr>
+        <tr class="row-pass">
+            <td>Links</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-pass">
+            <td>Canonical URL</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-fail">
+            <td>Open Graph Tags</td>
+            <td><span class="badge badge-fail">FAIL</span></td>
+            <td style="color: #FCA5A5;">Missing: og:image</td>
+        </tr>
+        <tr class="row-pass">
+            <td>Twitter Card</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-pass">
+            <td>Mobile Viewport</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-pass">
+            <td>Robots / Indexing</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-pass">
+            <td>Structured Data</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-pass">
+            <td>Performance</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+        <tr class="row-pass">
+            <td>HTTPS / Security</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td style="color: #666;">No issues found</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Recommendations -->
+<h1 class="page-break">Recommendations</h1>
+<p>Prioritized list of improvements based on the audit findings. Issues are ranked by severity.</p>
+
+
+        <div class="opportunity ">
+            <h3>
+                <span class="badge badge-medium">Medium</span>
+                &nbsp; 1. Image Alt Text
+            </h3>
+            <p>Add descriptive alt text to all images for accessibility and image search. Alt text helps Google understand image content.</p>
+            <ul><li style="color: #FCA5A5;">45/45 images missing alt text</li></ul>
+        </div>
+
+        <div class="opportunity ">
+            <h3>
+                <span class="badge badge-medium">Medium</span>
+                &nbsp; 2. Open Graph Tags
+            </h3>
+            <p>Add og:title, og:description, og:image, and og:url for social sharing. These control how your page appears when shared on social media.</p>
+            <ul><li style="color: #FCA5A5;">Missing: og:image</li></ul>
+        </div>
+
+<!-- Root Cause Analysis -->
+
+    <div class="page-break"></div>
+    <h1 style="border-bottom-color: #F59E0B;">Root Cause Analysis</h1>
+    <p style="color: #A1A1A1; font-size: 8.5pt; margin-bottom: 1mm;">
+        Every failure has a root cause and a fix. Below is a detailed breakdown of each issue:
+        <strong><span style="color: #F59E0B;">1 high</span>, <span style="color: #FDE68A;">1 medium</span></strong>
+    </p>
+    <p style="color: #666; font-size: 8pt; margin-bottom: 4mm;">
+        Each finding explains WHY the failure matters, WHAT likely caused it, HOW to fix it, and HOW to prevent it from happening again.
+    </p>
+    
+        <div class="issue-card" style="border-left-width: 4px; padding: 4mm; margin-bottom: 4mm;">
+            <div style="display: flex; align-items: center; gap: 2mm; margin-bottom: 2mm;">
+                <span class="issue-severity severity-high">high</span>
+                <span style="font-size: 8pt; color: #666; font-family: 'JetBrains Mono', monospace;">#1</span>
+                <span class="badge badge-info" style="margin-left: 2mm;">⏱ minutes</span>
+            </div>
+            <div class="issue-card-title" style="font-size: 10pt; margin-bottom: 2mm;">45/45 images missing alt text</div>
+
+            <div style="margin-bottom: 2.5mm;">
+                <strong style="color: #EF4444; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em;">Why It Matters</strong>
+                <p style="color: #A1A1A1; font-size: 8.5pt; margin-top: 1mm;">Alt text helps Google understand image content (images appear in Google Images search). It's also a legal accessibility requirement (ADA/WCAG) — screen readers can't describe images without alt text.</p>
+            </div>
+
+            <div style="margin-bottom: 2.5mm;">
+                <strong style="color: #F59E0B; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em;">Root Cause</strong>
+                <p style="color: #A1A1A1; font-size: 8.5pt; margin-top: 1mm;">Images added via CMS drag-and-drop often don't require alt text, so content editors skip it. Developer-added images (hero banners, icons) frequently omit alt attributes.</p>
+            </div>
+
+            <div style="margin-bottom: 1.5mm;">
+                <strong style="color: #22C55E; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em;">How To Fix</strong>
+                <ul style="margin: 1.5mm 0 0 4mm; padding: 0; list-style: none;">
+                    <li>1. For each image, ask: 'What would I tell someone on the phone about this image?' — that's your alt text.</li>
+<li>2. Add alt attribute: <img src="..." alt="Plumber fixing a burst pipe in Austin kitchen"></li>
+<li>3. Be descriptive but concise (under 125 characters).</li>
+<li>4. Include keywords naturally — don't stuff them.</li>
+<li>5. Decorative images (purely visual, no information): use alt="" (empty).</li>
+<li>6. For CMS images: go to Media Library → click image → add Alt Text.</li>
+                </ul>
+            </div>
+
+            
+        <div style="margin-top: 2mm; padding: 2.5mm; background: #0A1A0A; border: 1px solid #166534; border-radius: 3px;">
+            <strong style="color: #22C55E; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em;">🛡 Prevention</strong>
+            <p style="color: #A1A1A1; font-size: 8.5pt; margin-top: 1mm;">Make alt text required in your CMS upload workflow.</p>
+        </div>
+        </div>
+        <div class="issue-card" style="border-left-width: 4px; padding: 4mm; margin-bottom: 4mm;">
+            <div style="display: flex; align-items: center; gap: 2mm; margin-bottom: 2mm;">
+                <span class="issue-severity severity-medium">medium</span>
+                <span style="font-size: 8pt; color: #666; font-family: 'JetBrains Mono', monospace;">#2</span>
+                <span class="badge badge-info" style="margin-left: 2mm;">⏱ minutes</span>
+            </div>
+            <div class="issue-card-title" style="font-size: 10pt; margin-bottom: 2mm;">Missing Open Graph tags: og:image</div>
+
+            <div style="margin-bottom: 2.5mm;">
+                <strong style="color: #EF4444; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em;">Why It Matters</strong>
+                <p style="color: #A1A1A1; font-size: 8.5pt; margin-top: 1mm;">Open Graph tags control how your page appears when shared on Facebook, LinkedIn, Slack, and other social platforms. Without them, shares show a generic preview with no image, title, or description.</p>
+            </div>
+
+            <div style="margin-bottom: 2.5mm;">
+                <strong style="color: #F59E0B; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em;">Root Cause</strong>
+                <p style="color: #A1A1A1; font-size: 8.5pt; margin-top: 1mm;">OG tags are often forgotten because they don't affect Google ranking directly — they affect social media sharing. Developers focused on Google SEO may skip them.</p>
+            </div>
+
+            <div style="margin-bottom: 1.5mm;">
+                <strong style="color: #22C55E; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em;">How To Fix</strong>
+                <ul style="margin: 1.5mm 0 0 4mm; padding: 0; list-style: none;">
+                    <li>1. Add these tags to <head>:</li>
+<li>   <meta property="og:title" content="Page Title"></li>
+<li>   <meta property="og:description" content="Page description"></li>
+<li>   <meta property="og:image" content="https://yourdomain.com/image.jpg"></li>
+<li>   <meta property="og:url" content="https://yourdomain.com/page"></li>
+<li>   <meta property="og:type" content="website"></li>
+<li>2. Image should be 1200x630 pixels (optimal for social sharing).</li>
+<li>3. Test: Use Facebook's Sharing Debugger (developers.facebook.com/tools/debug) to preview.</li>
+<li>4. For CMS: Most SEO plugins auto-generate OG tags from the title/description.</li>
+                </ul>
+            </div>
+
+            
+        <div style="margin-top: 2mm; padding: 2.5mm; background: #0A1A0A; border: 1px solid #166534; border-radius: 3px;">
+            <strong style="color: #22C55E; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em;">🛡 Prevention</strong>
+            <p style="color: #A1A1A1; font-size: 8.5pt; margin-top: 1mm;">Add OG tags to your base HTML template so all pages inherit them.</p>
+        </div>
+        </div>
+    
+
+<!-- AI Insights -->
+
+    <div class="page-break"></div>
+    <h1 style="border-bottom-color: #8B5CF6;">AI-Powered Insights</h1>
+    <p style="color: #8B5CF6; font-size: 8.5pt; margin-bottom: 3mm;">Generated by Claude via OpenRouter — strategic analysis based on your report data</p>
+    
+        <div class="exec-summary" style="border-left-color: #8B5CF6;">
+            <h3 style="color: #8B5CF6; margin-bottom: 2mm;">AI Executive Summary</h3>
+            <p style="color: #D4D4D4;">Target.com has a solid SEO foundation with proper title tags, meta descriptions, and heading structure, but faces critical accessibility and social sharing issues. The site's 71 SEO score is significantly impacted by missing alt text on all 45 images and lack of Open Graph image tags.</p>
+        </div>
+        
+    
+
+<!-- Closing -->
+<div class="closing">
+    <p><strong>CloudGuard DR</strong> — Automated Resilience & SEO Platform</p>
+    <p>Report generated on 2026-08-24T16:53:20Z by CloudGuard DR</p>
+</div>
+
+</body></html>

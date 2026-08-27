@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UserPlus, Building2, MapPin, Globe, ArrowRight, Check, Zap } from 'lucide-react'
+import { UserPlus, Building, MapPin, Globe, ArrowRight, Check, Lightning } from '@phosphor-icons/react'
 
 interface IntakeFormData {
   business_name: string
@@ -117,9 +117,9 @@ export default function ClientIntake() {
             geographic_scope: form.geographic_scope,
             signals: [
               `City-level scope (${form.primary_city})`,
-              `${form.neighborhoods ? 'Neighborhoods identified: ' + form.neighborhoods : 'No neighborhoods specified — will discover during recon'}`,
+              `${form.neighborhoods ? 'Neighborhoods identified: ' + form.neighborhoods : 'No neighborhoods specified - will discover during recon'}`,
               'Classified as B2C local service business',
-              form.has_gbp ? 'Google Business Profile detected' : 'No GBP — will recommend setup',
+              form.has_gbp ? 'Google Business Profile detected' : 'No GBP - will recommend setup',
             ],
             location_page_strategy: form.neighborhoods
               ? `Neighborhood pages for: ${form.neighborhoods}`
@@ -164,14 +164,14 @@ export default function ClientIntake() {
             Client Created
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-            {result.client_id} — Business classified as <strong style={{ color: 'var(--accent-primary)' }}>{result.classification.classification}</strong>
+            {result.client_id} - Business classified as <strong style={{ color: 'var(--accent-primary)' }}>{result.classification.classification}</strong>
           </p>
         </div>
 
         {/* Classification */}
         <div className="card animate-in animate-in-delay-1" style={{ marginBottom: 'var(--space-6)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-4)' }}>
-            <span style={{ color: 'var(--accent-primary)' }}><Check size={14} /></span>
+            <span style={{ color: 'var(--accent-primary)' }}><Check size={14} weight="bold" /></span>
             <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               BUSINESS CLASSIFICATION
             </h3>
@@ -202,7 +202,7 @@ export default function ClientIntake() {
         {/* SEO Strategy */}
         <div className="card animate-in animate-in-delay-2" style={{ marginBottom: 'var(--space-6)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-4)' }}>
-            <span style={{ color: 'var(--accent-primary)' }}><Zap size={14} /></span>
+            <span style={{ color: 'var(--accent-primary)' }}><Lightning size={14} weight="regular" /></span>
             <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               RECOMMENDED SEO STRATEGY
             </h3>
@@ -248,7 +248,7 @@ export default function ClientIntake() {
             className="btn btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            <ArrowRight size={14} />
+            <ArrowRight size={14} weight="bold" />
             Start SEO Audit for This Client
           </button>
           <button
@@ -271,7 +271,7 @@ export default function ClientIntake() {
           Client Intake
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-          Step {step} of 3 — {step === 1 ? 'Business Info' : step === 2 ? 'Location & Scope' : 'Additional Details'}
+          Step {step} of 3 - {step === 1 ? 'Business Info' : step === 2 ? 'Location & Scope' : 'Additional Details'}
         </p>
       </div>
 
@@ -286,7 +286,7 @@ export default function ClientIntake() {
       {step === 1 && (
         <div className="card animate-in animate-in-delay-2">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-5)' }}>
-            <span style={{ color: 'var(--accent-primary)' }}><Building2 size={14} /></span>
+            <span style={{ color: 'var(--accent-primary)' }}><Building size={14} weight="regular" /></span>
             <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               BUSINESS INFORMATION
             </h3>
@@ -327,7 +327,7 @@ export default function ClientIntake() {
       {step === 2 && (
         <div className="card animate-in animate-in-delay-2">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-5)' }}>
-            <span style={{ color: 'var(--accent-primary)' }}><MapPin size={14} /></span>
+            <span style={{ color: 'var(--accent-primary)' }}><MapPin size={14} weight="regular" /></span>
             <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               LOCATION & GEOGRAPHIC SCOPE
             </h3>
@@ -354,9 +354,9 @@ export default function ClientIntake() {
             <label style={labelStyle}>GEOGRAPHIC SCOPE</label>
             <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               {([
-                ['city', 'Single City / Metro', 'B2C Local — neighborhood + suburb pages'],
-                ['regional', 'Multi-City / Regional', 'B2C Regional — city pages + neighborhoods'],
-                ['multi-state', 'Multi-State / National', 'B2B — one page per major market'],
+                ['city', 'Single City / Metro', 'B2C Local - neighborhood + suburb pages'],
+                ['regional', 'Multi-City / Regional', 'B2C Regional - city pages + neighborhoods'],
+                ['multi-state', 'Multi-State / National', 'B2B - one page per major market'],
               ] as const).map(([value, label, desc]) => (
                 <label key={value} className="stagger-child card-interactive" style={{
                   display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
@@ -385,7 +385,7 @@ export default function ClientIntake() {
       {step === 3 && (
         <div className="card animate-in animate-in-delay-2">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-5)' }}>
-            <span style={{ color: 'var(--accent-primary)' }}><Globe size={14} /></span>
+            <span style={{ color: 'var(--accent-primary)' }}><Globe size={14} weight="regular" /></span>
             <h3 style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               ADDITIONAL DETAILS
             </h3>
@@ -401,7 +401,7 @@ export default function ClientIntake() {
             <div>
               <label style={labelStyle}>LAUNCH STATUS</label>
               <select value={form.launch_status} onChange={e => update('launch_status', e.target.value)} className="form-input">
-                <option value="live">Live — current site</option>
+                <option value="live">Live - current site</option>
                 <option value="pre-launch">Pre-launch / Staging</option>
                 <option value="rebuild">Rebuild / Redesign</option>
               </select>
@@ -434,18 +434,18 @@ export default function ClientIntake() {
         ) : <div />}
         {step < 3 ? (
           <button onClick={() => setStep(step + 1)} disabled={!canProceed()} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: canProceed() ? 1 : 0.5 }}>
-            Next <ArrowRight size={14} />
+            Next <ArrowRight size={14} weight="bold" />
           </button>
         ) : (
           <button onClick={handleSubmit} disabled={submitting} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: submitting ? 0.6 : 1 }}>
             {submitting ? (
               <>
-                <div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                <div className="spinner" />
                 Classifying...
               </>
             ) : (
               <>
-                <UserPlus size={14} />
+                <UserPlus size={14} weight="regular" />
                 Create Client & Classify
               </>
             )}
@@ -453,7 +453,7 @@ export default function ClientIntake() {
         )}
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      
     </div>
   )
 }

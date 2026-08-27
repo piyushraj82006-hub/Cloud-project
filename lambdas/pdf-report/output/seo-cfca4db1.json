@@ -1,0 +1,121 @@
+{
+  "report_id": "seo-cfca4db1",
+  "target_url": "https://example.com",
+  "generated_at": "2026-08-24T16:48:31Z",
+  "seo_score": 42,
+  "seo_checks": {
+    "title": {
+      "present": true,
+      "issues": [
+        "Title too short (14 chars, aim for 30-60)"
+      ],
+      "value": "Example Domain"
+    },
+    "meta_description": {
+      "present": false,
+      "issues": [
+        "Missing meta description"
+      ],
+      "value": ""
+    },
+    "headings": {
+      "issues": [],
+      "h1_count": 1,
+      "has_h1": true
+    },
+    "images": {
+      "issues": [],
+      "total": 0,
+      "with_alt": 0
+    },
+    "canonical": {
+      "present": false,
+      "issues": [
+        "Missing canonical URL"
+      ]
+    },
+    "open_graph": {
+      "issues": [
+        "Missing: og:title, og:description, og:image"
+      ],
+      "tags_missing": [
+        "og:title",
+        "og:description",
+        "og:image"
+      ]
+    },
+    "viewport": {
+      "present": true,
+      "issues": []
+    }
+  },
+  "response_time_ms": 147,
+  "page_fetched": true,
+  "status_code": 200,
+  "content_length": 559,
+  "ai_insights": {
+    "executive_summary": "The website has a critically low SEO score of 42/100 with multiple fundamental issues affecting search visibility and social sharing. Missing meta description, inadequate title tag, absent canonical URL, and incomplete Open Graph tags are severely limiting the site's ability to rank well and appear properly in search results and social media shares.",
+    "weak_points": [
+      {
+        "check": "meta_description",
+        "severity": "critical",
+        "title": "Missing meta description",
+        "why_it_matters": "Meta descriptions directly impact click-through rates from search results and are often used as the snippet text, affecting organic traffic acquisition",
+        "root_cause": "No meta description tag implemented in the HTML head section",
+        "fix_steps": [
+          "Add meta description tag in HTML head",
+          "Write compelling 150-160 character description that includes target keywords",
+          "Ensure description accurately summarizes page content"
+        ],
+        "scope": "quick_win"
+      },
+      {
+        "check": "title",
+        "severity": "high",
+        "title": "Title tag too short and non-descriptive",
+        "why_it_matters": "Title tags are the most important on-page SEO factor and appear as clickable headlines in search results, directly affecting rankings and CTR",
+        "root_cause": "Generic 'Example Domain' title with only 14 characters provides no keyword value or user context",
+        "fix_steps": [
+          "Expand title to 30-60 characters",
+          "Include primary target keywords",
+          "Make title descriptive and compelling for users",
+          "Follow format: Primary Keyword | Brand Name"
+        ],
+        "scope": "quick_win"
+      },
+      {
+        "check": "canonical",
+        "severity": "high",
+        "title": "Missing canonical URL",
+        "why_it_matters": "Canonical tags prevent duplicate content issues and help search engines understand the preferred version of the page, avoiding ranking dilution",
+        "root_cause": "No canonical link tag specified in HTML head section",
+        "fix_steps": [
+          "Add canonical link tag pointing to the preferred URL version",
+          "Ensure canonical URL is absolute and accessible",
+          "Implement across all pages consistently"
+        ],
+        "scope": "quick_win"
+      },
+      {
+        "check": "open_graph",
+        "severity": "medium",
+        "title": "Missing Open Graph tags for social sharing",
+        "why_it_matters": "Open Graph tags control how content appears when shared on social media platforms, affecting social traffic and brand presentation",
+        "root_cause": "No og:title, og:description, or og:image tags implemented",
+        "fix_steps": [
+          "Add og:title tag with compelling title",
+          "Add og:description with engaging summary",
+          "Add og:image with high-quality branded image (1200x630px)",
+          "Include og:url and og:type tags for completeness"
+        ],
+        "scope": "quick_win"
+      }
+    ],
+    "quick_wins": [
+      "Add meta description tag with 150-160 character compelling summary",
+      "Expand title tag to 30-60 characters with target keywords",
+      "Implement canonical URL tag pointing to preferred page version",
+      "Add basic Open Graph tags (og:title, og:description, og:image)"
+    ]
+  }
+}

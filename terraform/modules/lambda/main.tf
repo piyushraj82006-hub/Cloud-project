@@ -19,6 +19,7 @@ variable "pdf_report_layer_arn" {
   type    = string
   default = ""
 }
+variable "ai_insights_role_arn" { type = string }
 variable "client_intake_role_arn" { type = string }
 
 variable "test_runs_table_name" { type = string }
@@ -50,6 +51,7 @@ data "archive_file" "lambda" {
     "seo-report",
     "competitor-analysis",
     "pdf-report",
+    "ai-insights",
     "client-intake",
   ])
 
@@ -96,9 +98,9 @@ resource "aws_lambda_function" "injection" {
 
   environment {
     variables = {
-      ENVIRONMENT         = var.environment
-      AWS_REGION          = var.aws_region
-      FIS_EXPERIMENT_ID   = "" # Set after FIS module is applied
+      ENVIRONMENT       = var.environment
+      AWS_REGION        = var.aws_region
+      FIS_EXPERIMENT_ID = "" # Set after FIS module is applied
     }
   }
 }
@@ -172,12 +174,12 @@ resource "aws_lambda_function" "scoring" {
 
   environment {
     variables = {
-      ENVIRONMENT              = var.environment
-      AWS_REGION               = var.aws_region
-      TEST_RUNS_TABLE          = var.test_runs_table_name
-      RTO_TARGET_SSM_ARN       = var.rto_target_ssm_arn
-      RPO_TARGET_SSM_ARN       = var.rpo_target_ssm_arn
-      SCORE_THRESHOLD_SSM_ARN  = var.score_threshold_ssm_arn
+      ENVIRONMENT             = var.environment
+      AWS_REGION              = var.aws_region
+      TEST_RUNS_TABLE         = var.test_runs_table_name
+      RTO_TARGET_SSM_ARN      = var.rto_target_ssm_arn
+      RPO_TARGET_SSM_ARN      = var.rpo_target_ssm_arn
+      SCORE_THRESHOLD_SSM_ARN = var.score_threshold_ssm_arn
     }
   }
 }
@@ -201,10 +203,10 @@ resource "aws_lambda_function" "audit_report" {
 
   environment {
     variables = {
-      ENVIRONMENT          = var.environment
-      AWS_REGION           = var.aws_region
-      REPORTS_BUCKET       = var.reports_bucket_id
-      AUDIT_REPORTS_TABLE  = var.audit_reports_table_name
+      ENVIRONMENT         = var.environment
+      AWS_REGION          = var.aws_region
+      REPORTS_BUCKET      = var.reports_bucket_id
+      AUDIT_REPORTS_TABLE = var.audit_reports_table_name
     }
   }
 }
@@ -228,10 +230,10 @@ resource "aws_lambda_function" "external_audit" {
 
   environment {
     variables = {
-      ENVIRONMENT          = var.environment
-      AWS_REGION           = var.aws_region
-      REPORTS_BUCKET       = var.reports_bucket_id
-      AUDIT_REPORTS_TABLE  = var.audit_reports_table_name
+      ENVIRONMENT         = var.environment
+      AWS_REGION          = var.aws_region
+      REPORTS_BUCKET      = var.reports_bucket_id
+      AUDIT_REPORTS_TABLE = var.audit_reports_table_name
     }
   }
 }
@@ -255,10 +257,10 @@ resource "aws_lambda_function" "alert" {
 
   environment {
     variables = {
-      ENVIRONMENT         = var.environment
-      AWS_REGION          = var.aws_region
-      SNS_TOPIC_ARN       = var.sns_topic_arn
-      TEST_RUNS_TABLE     = var.test_runs_table_name
+      ENVIRONMENT             = var.environment
+      AWS_REGION              = var.aws_region
+      SNS_TOPIC_ARN           = var.sns_topic_arn
+      TEST_RUNS_TABLE         = var.test_runs_table_name
       SCORE_THRESHOLD_SSM_ARN = var.score_threshold_ssm_arn
     }
   }
@@ -283,11 +285,11 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      ENVIRONMENT              = var.environment
-      AWS_REGION               = var.aws_region
-      TEST_RUNS_TABLE          = var.test_runs_table_name
-      AUDIT_REPORTS_TABLE      = var.audit_reports_table_name
-      REPORTS_BUCKET           = var.reports_bucket_id
+      ENVIRONMENT         = var.environment
+      AWS_REGION          = var.aws_region
+      TEST_RUNS_TABLE     = var.test_runs_table_name
+      AUDIT_REPORTS_TABLE = var.audit_reports_table_name
+      REPORTS_BUCKET      = var.reports_bucket_id
     }
   }
 }
@@ -343,8 +345,8 @@ resource "aws_lambda_function" "seo_report" {
   role             = var.seo_report_role_arn
   handler          = "handler.lambda_handler"
   runtime          = "python3.12"
-  timeout          = 60
-  memory_size      = 256
+  timeout          = 180
+  memory_size      = 512
 
   vpc_config {
     subnet_ids         = var.private_subnet_ids
@@ -353,10 +355,13 @@ resource "aws_lambda_function" "seo_report" {
 
   environment {
     variables = {
-      ENVIRONMENT          = var.environment
-      AWS_REGION           = var.aws_region
-      REPORTS_BUCKET       = var.reports_bucket_id
-      AUDIT_REPORTS_TABLE  = var.audit_reports_table_name
+      ENVIRONMENT         = var.environment
+      AWS_REGION          = var.aws_region
+      REPORTS_BUCKET      = var.reports_bucket_id
+      AUDIT_REPORTS_TABLE = var.audit_reports_table_name
+      PDF_REPORT_LAMBDA   = "${local.name_prefix}-pdf-report"
+      OPENROUTER_API_KEY  = ""
+      OPENROUTER_MODEL    = "anthropic/claude-sonnet-4"
     }
   }
 }
@@ -392,10 +397,10 @@ resource "aws_lambda_function" "competitor_analysis" {
 
   environment {
     variables = {
-      ENVIRONMENT          = var.environment
-      AWS_REGION           = var.aws_region
-      REPORTS_BUCKET       = var.reports_bucket_id
-      AUDIT_REPORTS_TABLE  = var.audit_reports_table_name
+      ENVIRONMENT         = var.environment
+      AWS_REGION          = var.aws_region
+      REPORTS_BUCKET      = var.reports_bucket_id
+      AUDIT_REPORTS_TABLE = var.audit_reports_table_name
     }
   }
 }
@@ -421,9 +426,8 @@ resource "aws_lambda_function" "pdf_report" {
   role             = var.pdf_report_role_arn
   handler          = "handler.lambda_handler"
   runtime          = "python3.12"
-  timeout          = 120
-  memory_size      = 512
-  layers           = var.pdf_report_layer_arn != "" ? [var.pdf_report_layer_arn] : []
+  timeout          = 180
+  memory_size      = 256
 
   vpc_config {
     subnet_ids         = var.private_subnet_ids
@@ -432,10 +436,13 @@ resource "aws_lambda_function" "pdf_report" {
 
   environment {
     variables = {
-      ENVIRONMENT          = var.environment
-      AWS_REGION           = var.aws_region
-      REPORTS_BUCKET       = var.reports_bucket_id
-      AUDIT_REPORTS_TABLE  = var.audit_reports_table_name
+      ENVIRONMENT         = var.environment
+      AWS_REGION          = var.aws_region
+      REPORTS_BUCKET      = var.reports_bucket_id
+      AUDIT_REPORTS_TABLE = var.audit_reports_table_name
+      OPENROUTER_API_KEY  = ""
+      OPENROUTER_MODEL    = "anthropic/claude-sonnet-4"
+      PDFBOLT_API_KEY     = ""
     }
   }
 }
@@ -450,6 +457,47 @@ output "pdf_report_lambda_invoke_arn" {
 
 output "pdf_report_lambda_function_name" {
   value = aws_lambda_function.pdf_report.function_name
+}
+
+# ─── AI Insights Lambda ─────────────────────────────────────────
+
+resource "aws_lambda_function" "ai_insights" {
+  filename         = data.archive_file.lambda["ai-insights"].output_path
+  source_code_hash = data.archive_file.lambda["ai-insights"].output_base64sha256
+  function_name    = "${local.name_prefix}-ai-insights"
+  role             = var.ai_insights_role_arn
+  handler          = "handler.lambda_handler"
+  runtime          = "python3.12"
+  timeout          = 30
+  memory_size      = 128
+
+  vpc_config {
+    subnet_ids         = var.private_subnet_ids
+    security_group_ids = [aws_security_group.lambda.id]
+  }
+
+  environment {
+    variables = {
+      ENVIRONMENT         = var.environment
+      AWS_REGION          = var.aws_region
+      REPORTS_BUCKET      = var.reports_bucket_id
+      AUDIT_REPORTS_TABLE = var.audit_reports_table_name
+      OPENROUTER_API_KEY  = "" # Set via SSM: /cloudguard/{env}/openrouter-api-key
+      OPENROUTER_MODEL    = "anthropic/claude-sonnet-4"
+    }
+  }
+}
+
+output "ai_insights_lambda_arn" {
+  value = aws_lambda_function.ai_insights.arn
+}
+
+output "ai_insights_lambda_invoke_arn" {
+  value = aws_lambda_function.ai_insights.invoke_arn
+}
+
+output "ai_insights_lambda_function_name" {
+  value = aws_lambda_function.ai_insights.function_name
 }
 
 # ─── Client Intake Lambda ──────────────────────────────────────────
@@ -471,7 +519,7 @@ resource "aws_lambda_function" "client_intake" {
 
   environment {
     variables = {
-      ENVIRONMENT  = var.environment
+      ENVIRONMENT   = var.environment
       CLIENTS_TABLE = var.clients_table_name
     }
   }

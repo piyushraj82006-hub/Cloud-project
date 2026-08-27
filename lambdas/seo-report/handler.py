@@ -11,6 +11,7 @@ import uuid
 import re
 import ssl
 import urllib.request
+import urllib.error
 import boto3
 from html.parser import HTMLParser
 from urllib.parse import urlparse, urljoin
@@ -21,6 +22,142 @@ dynamodb = boto3.resource("dynamodb")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "dev")
 REPORTS_BUCKET = os.environ.get("REPORTS_BUCKET", f"cloudguard-{ENVIRONMENT}-reports")
 AUDIT_REPORTS_TABLE = os.environ.get("AUDIT_REPORTS_TABLE", f"cloudguard-{ENVIRONMENT}-audit-reports")
+PDF_REPORT_LAMBDA = os.environ.get("PDF_REPORT_LAMBDA", f"cloudguard-{ENVIRONMENT}-pdf-report")
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "anthropic/claude-sonnet-4")
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+
+
+def get_api_key():
+    """Get OpenRouter API key from env or SSM Parameter Store."""
+    if OPENROUTER_API_KEY:
+        return OPENROUTER_API_KEY
+    try:
+        ssm = boto3.client("ssm")
+        param = ssm.get_parameter(
+            Name=f"/cloudguard/{ENVIRONMENT}/openrouter-api-key",
+            WithDecryption=True,
+        )
+        return param["Parameter"]["Value"]
+    except Exception:
+        return ""
+
+
+SEO_AI_PROMPT = """You are an expert SEO strategist. Analyze this SEO audit report and provide a concise, actionable PDF summary.
+
+For each failing check, explain:
+1. WHY it matters (business impact)
+2. ROOT CAUSE (what's wrong)
+3. HOW TO FIX (specific steps)
+4. EFFORT (quick win / hours / days)
+
+Also provide:
+- Executive summary (2-3 sentences)
+- Top 3 critical actions ranked by impact
+- Quick wins (do this week)
+- Medium-term improvements (1 month)
+- Competitive advantage opportunities
+
+SEO audit data:
+{report_data}
+
+Respond in valid JSON only, no markdown:
+{{
+  "executive_summary": "...",
+  "critical_actions": [
+    {{"action": "...", "impact": "high|medium", "implementation": "...", "effort": "minutes|hours|days"}}
+  ],
+  "failure_analysis": [
+    {{
+      "check": "...",
+      "why_it_matters": "...",
+      "root_cause": "...",
+      "fix_steps": ["..."],
+      "scope": "quick_win|medium_project|major_initiative"
+    }}
+  ],
+  "quick_wins": ["..."],
+  "medium_improvements": ["..."],
+  "opportunities": [
+    {{"title": "...", "description": "...", "effort": "low|medium|high"}}
+  ]
+}}"""
+
+
+def cors_headers():
+    """Return CORS headers for API Gateway responses."""
+    return {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    }
+
+
+def call_openrouter(prompt, api_key):
+    """Call OpenRouter API for AI insights."""
+    payload = json.dumps({
+        "model": OPENROUTER_MODEL,
+        "messages": [
+            {"role": "system", "content": "You are an expert technical SEO analyst. Respond with valid JSON only."},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.3,
+        "max_tokens": 2048,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        OPENROUTER_BASE_URL,
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+            "HTTP-Referer": "https://cloudguard-dr.com",
+            "X-Title": "CloudGuard DR",
+        },
+        method="POST",
+    )
+    try:
+        resp = urllib.request.urlopen(req, timeout=60)
+        body = json.loads(resp.read().decode("utf-8"))
+        return body["choices"][0]["message"]["content"]
+    except Exception as e:
+        print(f"[SEOR] OpenRouter error: {e}")
+        return None
+
+
+def parse_ai_response(text):
+    """Parse AI JSON response, handling markdown code fences."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    match = re.search(r"```(?:json)?\s*\n?(.*?)\n?```", text, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(1))
+        except json.JSONDecodeError:
+            pass
+    return None
+
+
+def generate_pdf(report_id, report_type="seo"):
+    """Invoke the PDF report Lambda to generate a branded PDF."""
+    try:
+        lambda_client = boto3.client("lambda")
+        payload = json.dumps({
+            "report_type": report_type,
+            "report_id": report_id,
+        })
+        resp = lambda_client.invoke(
+            FunctionName=PDF_REPORT_LAMBDA,
+            InvocationType="RequestResponse",
+            Payload=payload,
+        )
+        result = json.loads(resp["Payload"].read().decode("utf-8"))
+        return result.get("pdf_url"), result.get("pdf_key")
+    except Exception as e:
+        print(f"[SEOR] PDF generation failed: {e}")
+        return None, None
 
 
 class SEOHTMLParser(HTMLParser):
@@ -233,23 +370,58 @@ def lambda_handler(event, context):
             "s3_report_key": s3_key,
         })
 
+        # ── AI Insights via OpenRouter ──
+        ai_insights = None
+        api_key = get_api_key()
+        if api_key:
+            print(f"[SEOR] Calling OpenRouter for AI insights...")
+            prompt = SEO_AI_PROMPT.format(report_data=json.dumps(report, indent=2))
+            ai_text = call_openrouter(prompt, api_key)
+            if ai_text:
+                ai_insights = parse_ai_response(ai_text)
+                if ai_insights:
+                    report["ai_insights"] = ai_insights
+                    # Re-write enriched report to S3
+                    s3_client.put_object(
+                        Bucket=REPORTS_BUCKET,
+                        Key=s3_key,
+                        Body=json.dumps(report, indent=2),
+                        ContentType="application/json",
+                    )
+                    print(f"[SEOR] AI insights attached to report {report_id}")
+        else:
+            print("[SEOR] No OpenRouter API key — skipping AI insights")
+
+        # ── Generate PDF summary ──
+        pdf_url, pdf_key = generate_pdf(report_id, "seo")
+
         result = {
             "statusCode": 200,
-            "report_id": report_id,
-            "target_url": target_url,
-            "seo_score": seo_score,
-            "seo_checks": seo_checks,
-            "generated_at": report["generated_at"],
-            "s3_key": s3_key,
-            "html_key": html_key,
+            "headers": cors_headers(),
+            "body": json.dumps({
+                "report_id": report_id,
+                "target_url": target_url,
+                "seo_score": seo_score,
+                "seo_checks": seo_checks,
+                "generated_at": report["generated_at"],
+                "s3_key": s3_key,
+                "html_key": html_key,
+                "ai_insights": ai_insights,
+                "pdf_url": pdf_url,
+                "pdf_key": pdf_key,
+            }),
         }
 
-        print(f"[SEOR] SEO report generated: {report_id} (score: {seo_score})")
+        print(f"[SEOR] SEO report generated: {report_id} (score: {seo_score}, pdf: {'yes' if pdf_url else 'no'})")
         return result
 
     except ValueError as e:
         print(f"[SEOR] Validation error: {str(e)}")
-        return {"statusCode": 400, "error": str(e)}
+        return {
+            "statusCode": 400,
+            "headers": cors_headers(),
+            "body": json.dumps({"error": str(e)}),
+        }
     except Exception as e:
         print(f"[SEOR] Error: {str(e)}")
         raise

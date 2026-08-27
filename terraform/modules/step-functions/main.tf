@@ -4,6 +4,8 @@ variable "monitor_lambda_arn" { type = string }
 variable "measurement_lambda_arn" { type = string }
 variable "scoring_lambda_arn" { type = string }
 variable "audit_report_lambda_arn" { type = string }
+variable "ai_insights_lambda_arn" { type = string }
+variable "pdf_report_lambda_arn" { type = string }
 variable "alert_lambda_arn" { type = string }
 variable "step_functions_role_arn" { type = string }
 
@@ -16,7 +18,7 @@ resource "aws_sfn_state_machine" "dr_test" {
   role_arn = var.step_functions_role_arn
 
   definition = jsonencode({
-    Comment = "CloudGuard DR Test: Inject → Monitor → Measure → Score → Report → Alert"
+    Comment = "CloudGuard DR Test: Inject → Monitor → Measure → Score → Report → AIInsights → GeneratePDF → Alert"
     StartAt = "Inject"
     States = {
       Inject = {
@@ -102,7 +104,7 @@ resource "aws_sfn_state_machine" "dr_test" {
       Report = {
         Type     = "Task"
         Resource = var.audit_report_lambda_arn
-        Next     = "Alert"
+        Next     = "AIInsights"
         Retry = [
           {
             ErrorEquals     = ["States.ALL"]
@@ -115,6 +117,54 @@ resource "aws_sfn_state_machine" "dr_test" {
           {
             ErrorEquals = ["States.ALL"]
             Next        = "Failed"
+          }
+        ]
+      }
+
+      AIInsights = {
+        Type     = "Task"
+        Resource = var.ai_insights_lambda_arn
+        Next     = "GeneratePDF"
+        Retry = [
+          {
+            ErrorEquals     = ["States.ALL"]
+            IntervalSeconds = 10
+            MaxAttempts     = 1
+            BackoffRate     = 2
+          }
+        ]
+        Catch = [
+          {
+            ErrorEquals = ["States.ALL"]
+            Next        = "GeneratePDF"
+            ResultPath  = "$.ai_error"
+          }
+        ]
+      }
+
+      GeneratePDF = {
+        Type      = "Task"
+        Resource  = var.pdf_report_lambda_arn
+        InputPath = "$"
+        Parameters = {
+          "report_type" = "dr-test"
+          "report_id."  = "$.run_id"
+          "agency_name" = "CloudGuard DR"
+        }
+        Next = "Alert"
+        Retry = [
+          {
+            ErrorEquals     = ["States.ALL"]
+            IntervalSeconds = 10
+            MaxAttempts     = 2
+            BackoffRate     = 2
+          }
+        ]
+        Catch = [
+          {
+            ErrorEquals = ["States.ALL"]
+            Next        = "Alert"
+            ResultPath  = "$.pdf_error"
           }
         ]
       }
@@ -144,7 +194,7 @@ resource "aws_sfn_state_machine" "dr_test" {
       }
 
       Failed = {
-        Type = "Fail"
+        Type  = "Fail"
         Cause = "Test run failed"
         Error = "DRTestFailed"
       }

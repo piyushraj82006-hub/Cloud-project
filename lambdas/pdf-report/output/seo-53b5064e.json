@@ -1,0 +1,50 @@
+{
+  "report_id": "seo-53b5064e",
+  "target_url": "https://www.target.com",
+  "generated_at": "2026-08-24T16:51:40Z",
+  "seo_score": 71,
+  "seo_checks": {
+    "title": {
+      "present": true,
+      "issues": [],
+      "value": "Target : Expect More. Pay Less."
+    },
+    "meta_description": {
+      "present": true,
+      "issues": [],
+      "value": "Shop Target online and in-store for everything from groceries and essentials to clothing and electronics. Choose contactless pickup or delivery today."
+    },
+    "headings": {
+      "issues": [],
+      "h1_count": 1,
+      "has_h1": true
+    },
+    "images": {
+      "issues": [
+        "45/45 images missing alt text"
+      ],
+      "total": 45,
+      "with_alt": 0
+    },
+    "canonical": {
+      "present": true,
+      "issues": []
+    },
+    "open_graph": {
+      "issues": [
+        "Missing: og:image"
+      ],
+      "tags_missing": [
+        "og:image"
+      ]
+    },
+    "viewport": {
+      "present": true,
+      "issues": []
+    }
+  },
+  "response_time_ms": 1624,
+  "page_fetched": true,
+  "status_code": 200,
+  "content_length": 371064
+}

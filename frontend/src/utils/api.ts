@@ -13,6 +13,8 @@ export interface TestRun {
   rto_target: number
   rpo_target: number
   report_s3_key: string
+  pdf_key?: string
+  pdf_url?: string
 }
 
 export interface AuditReport {
@@ -48,6 +50,16 @@ export interface SEOReport {
   response_time_ms: number
   content_length: number
   seo_score: number
+  pdf_url?: string
+  pdf_key?: string
+  ai_insights?: {
+    executive_summary?: string
+    critical_actions?: Array<{ action: string; impact: string; implementation: string; effort: string }>
+    failure_analysis?: Array<{ check: string; why_it_matters: string; root_cause: string; fix_steps: string[]; scope: string }>
+    quick_wins?: string[]
+    medium_improvements?: string[]
+    opportunities?: Array<{ title: string; description: string; effort: string }>
+  }
   seo_checks: {
     title: SEOCheckItem
     meta_description: SEOCheckItem
@@ -212,6 +224,17 @@ export interface LocationPage {
   keywords: string[]
 }
 
+export interface WeakPoint {
+  category: string
+  severity: 'critical' | 'high' | 'medium'
+  title: string
+  why_it_matters: string
+  root_cause: string
+  fix_steps: string[]
+  estimated_effort?: string
+  prevention?: string
+}
+
 export interface PDFReport {
   statusCode: number
   pdf_key: string
@@ -262,6 +285,19 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Unwrap API Gateway proxy responses: { statusCode, headers, body } → parsed body
+api.interceptors.response.use((response) => {
+  const data = response.data
+  if (data && typeof data === 'object' && 'body' in data && 'statusCode' in data) {
+    try {
+      response.data = typeof data.body === 'string' ? JSON.parse(data.body) : data.body
+    } catch {
+      // body is not JSON — keep as-is
+    }
+  }
+  return response
+})
+
 // API functions
 export const apiClient = {
   // Runs
@@ -276,7 +312,7 @@ export const apiClient = {
   },
 
   async getRunReport(runId: string) {
-    const response = await api.get(`/runs/${runId}/report`)
+    const response = await api.get<Record<string, unknown> & { weak_points?: WeakPoint[]; report_type?: string; pdf_url?: string }>(`/runs/${runId}/report`)
     return response.data
   },
 
@@ -286,6 +322,46 @@ export const apiClient = {
       run_id_a: runIdA,
       run_id_b: runIdB,
     })
+    return response.data
+  },
+
+  // DR test (fault injection)
+  async runDRTest(params: {
+    fault_type: string
+    target_url?: string
+    port?: string
+    security_group_id?: string
+    bucket_name?: string
+    vpc_id?: string
+  }) {
+    const response = await api.post('/dr-test', params)
+    return response.data
+  },
+
+  // Compare two sites
+  async compareSites(params: {
+    url_a: string
+    url_b: string
+    parameters?: string[]
+  }) {
+    const response = await api.post('/compare-sites', params)
+    return response.data
+  },
+
+  // Comparison history
+  async listComparisons(params?: { limit?: number }) {
+    const response = await api.get('/comparisons', { params })
+    return response.data
+  },
+
+  async getComparison(comparisonId: string) {
+    const response = await api.get(`/comparisons/${comparisonId}`)
+    return response.data
+  },
+
+  // DR Recommendations
+  async getRecommendations(params?: { limit?: number }) {
+    const response = await api.get('/recommendations', { params })
     return response.data
   },
 
@@ -347,8 +423,10 @@ export const apiClient = {
 
   // PDF report generation
   async generatePDFReport(params: {
-    report_type: 'seo' | 'competitor' | 'dr-test'
+    report_type: 'seo' | 'competitor' | 'dr-test' | 'comparison'
     report_id: string
+    run_id_a?: string
+    run_id_b?: string
     agency_name?: string
   }) {
     const response = await api.post<PDFReport>('/report/pdf', params)

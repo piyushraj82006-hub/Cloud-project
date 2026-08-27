@@ -300,7 +300,7 @@ This will:
 
 Tests run automatically every **Monday at 8 AM UTC** via EventBridge.
 
-### Option C: Use the Dashboard
+### Option C: Use the Dashboard npx skills add Leonxlnx/taste-skill
 
 1. Go to **http://localhost:3000**
 2. Click **"Run New Test"**

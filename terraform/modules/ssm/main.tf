@@ -6,6 +6,11 @@ variable "sns_topic_arn" { type = string }
 variable "test_runs_table" { type = string }
 variable "audit_reports_table" { type = string }
 variable "reports_bucket" { type = string }
+variable "openrouter_api_key" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
 
 locals {
   name_prefix = "cloudguard-${var.environment}"
@@ -51,6 +56,15 @@ resource "aws_ssm_parameter" "reports_bucket" {
   name  = "/${local.name_prefix}/reports-bucket"
   type  = "String"
   value = var.reports_bucket
+}
+
+# ─── OpenRouter API Key (for AI insights) ───
+
+resource "aws_ssm_parameter" "openrouter_api_key" {
+  count = var.openrouter_api_key != "" ? 1 : 0
+  name  = "/${local.name_prefix}/openrouter-api-key"
+  type  = "SecureString"
+  value = var.openrouter_api_key
 }
 
 # ─── Outputs ────────────────────────────────────────────────────────

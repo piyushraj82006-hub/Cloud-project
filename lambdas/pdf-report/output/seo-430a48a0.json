@@ -1,0 +1,137 @@
+{
+  "report_id": "seo-430a48a0",
+  "target_url": "https://craigslist.org",
+  "generated_at": "2026-08-24T16:50:29Z",
+  "seo_score": 42,
+  "seo_checks": {
+    "title": {
+      "present": true,
+      "issues": [
+        "Title too long (79 chars, will be truncated)"
+      ],
+      "value": "craigslist: chennai jobs, apartments, for sale, services, community, and events"
+    },
+    "meta_description": {
+      "present": true,
+      "issues": [
+        "Meta description too short (115 chars)"
+      ],
+      "value": "craigslist provides local classifieds and forums for jobs, housing, for sale, services, local community, and events"
+    },
+    "headings": {
+      "issues": [
+        "Multiple H1 tags (2)"
+      ],
+      "h1_count": 2,
+      "has_h1": true
+    },
+    "images": {
+      "issues": [],
+      "total": 0,
+      "with_alt": 0
+    },
+    "canonical": {
+      "present": true,
+      "issues": []
+    },
+    "open_graph": {
+      "issues": [
+        "Missing: og:image"
+      ],
+      "tags_missing": [
+        "og:image"
+      ]
+    },
+    "viewport": {
+      "present": true,
+      "issues": []
+    }
+  },
+  "response_time_ms": 9320,
+  "page_fetched": true,
+  "status_code": 200,
+  "content_length": 54582,
+  "ai_insights": {
+    "executive_summary": "Craigslist.org has a poor SEO score of 42/100 with several critical technical issues affecting search visibility and user experience. The site suffers from multiple H1 tags, suboptimal title length, insufficient meta description, missing social media optimization, and extremely slow page load times that will significantly impact search rankings and user engagement.",
+    "weak_points": [
+      {
+        "check": "title",
+        "severity": "medium",
+        "title": "Title tag too long and will be truncated in search results",
+        "why_it_matters": "Truncated titles reduce click-through rates and may not convey the full value proposition to searchers, directly impacting organic traffic",
+        "root_cause": "Title tag is 79 characters when Google typically displays only 50-60 characters in search results",
+        "fix_steps": [
+          "Shorten title to under 60 characters",
+          "Prioritize most important keywords at the beginning",
+          "Consider location-specific titles for better local SEO"
+        ],
+        "scope": "quick_win"
+      },
+      {
+        "check": "meta_description",
+        "severity": "medium",
+        "title": "Meta description too short and underutilized",
+        "why_it_matters": "Short meta descriptions miss opportunities to include compelling copy and keywords that could improve click-through rates from search results",
+        "root_cause": "Meta description is only 115 characters when Google allows up to 155-160 characters",
+        "fix_steps": [
+          "Expand meta description to 150-155 characters",
+          "Include location-specific keywords",
+          "Add compelling call-to-action phrases",
+          "Highlight unique value propositions"
+        ],
+        "scope": "quick_win"
+      },
+      {
+        "check": "headings",
+        "severity": "high",
+        "title": "Multiple H1 tags confuse search engines",
+        "why_it_matters": "Multiple H1 tags dilute the page's main topic signal to search engines, potentially harming rankings for primary keywords",
+        "root_cause": "Page contains 2 H1 tags instead of the recommended single H1 per page",
+        "fix_steps": [
+          "Identify the primary H1 that represents the main page topic",
+          "Convert secondary H1 to H2 or H3",
+          "Ensure proper heading hierarchy (H1 > H2 > H3)",
+          "Review content structure for logical flow"
+        ],
+        "scope": "quick_win"
+      },
+      {
+        "check": "open_graph",
+        "severity": "medium",
+        "title": "Missing Open Graph image reduces social media visibility",
+        "why_it_matters": "Missing og:image means poor presentation when shared on social media, reducing click-through rates and social engagement",
+        "root_cause": "No og:image meta tag is present in the page head",
+        "fix_steps": [
+          "Create or select a representative image (1200x630px recommended)",
+          "Add og:image meta tag with absolute URL",
+          "Include og:image:alt for accessibility",
+          "Test social sharing appearance"
+        ],
+        "scope": "quick_win"
+      },
+      {
+        "check": "response_time",
+        "severity": "critical",
+        "title": "Extremely slow page load time severely impacts SEO and user experience",
+        "why_it_matters": "9.3 second load time is far above Google's recommended 2-3 seconds, directly harming search rankings and causing high bounce rates",
+        "root_cause": "Page takes 9320ms to load, indicating server performance issues, unoptimized code, or resource bottlenecks",
+        "fix_steps": [
+          "Conduct server performance audit",
+          "Implement caching mechanisms",
+          "Optimize database queries",
+          "Compress and minify CSS/JS files",
+          "Enable GZIP compression",
+          "Consider CDN implementation",
+          "Optimize server configuration"
+        ],
+        "scope": "major_initiative"
+      }
+    ],
+    "quick_wins": [
+      "Shorten title tag to under 60 characters while keeping key terms",
+      "Expand meta description to 150-155 characters with compelling copy",
+      "Fix multiple H1 tags by converting one to H2",
+      "Add og:image meta tag with appropriate social sharing image"
+    ]
+  }
+}

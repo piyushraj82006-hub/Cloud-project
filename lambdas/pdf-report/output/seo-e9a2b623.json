@@ -1,0 +1,96 @@
+{
+  "report_id": "seo-e9a2b623",
+  "target_url": "https://www.target.com",
+  "generated_at": "2026-08-24T16:53:20Z",
+  "seo_score": 71,
+  "seo_checks": {
+    "title": {
+      "present": true,
+      "issues": [],
+      "value": "Target : Expect More. Pay Less."
+    },
+    "meta_description": {
+      "present": true,
+      "issues": [],
+      "value": "Shop Target online and in-store for everything from groceries and essentials to clothing and electronics. Choose contactless pickup or delivery today."
+    },
+    "headings": {
+      "issues": [],
+      "h1_count": 1,
+      "has_h1": true
+    },
+    "images": {
+      "issues": [
+        "45/45 images missing alt text"
+      ],
+      "total": 45,
+      "with_alt": 0
+    },
+    "canonical": {
+      "present": true,
+      "issues": []
+    },
+    "open_graph": {
+      "issues": [
+        "Missing: og:image"
+      ],
+      "tags_missing": [
+        "og:image"
+      ]
+    },
+    "viewport": {
+      "present": true,
+      "issues": []
+    }
+  },
+  "response_time_ms": 3650,
+  "page_fetched": true,
+  "status_code": 200,
+  "content_length": 371523,
+  "ai_insights": {
+    "executive_summary": "Target.com has a solid SEO foundation with proper title tags, meta descriptions, and heading structure, but faces critical accessibility and social sharing issues. The site's 71 SEO score is significantly impacted by missing alt text on all 45 images and lack of Open Graph image tags.",
+    "weak_points": [
+      {
+        "check": "images",
+        "severity": "critical",
+        "title": "All Images Missing Alt Text",
+        "why_it_matters": "Missing alt text creates accessibility barriers for screen readers and prevents search engines from understanding image content for rankings.",
+        "root_cause": "The development team has not implemented alt attributes on any of the 45 images across the page.",
+        "fix_steps": [
+          "Audit all images and create descriptive alt text for each based on content and context",
+          "Implement automated checks in the CMS to require alt text before image publishing",
+          "Train content creators on writing effective alt text that describes the image's purpose and content"
+        ]
+      },
+      {
+        "check": "open_graph",
+        "severity": "high",
+        "title": "Missing Open Graph Image",
+        "why_it_matters": "Without og:image tags, social media platforms cannot display attractive preview images when the page is shared, reducing click-through rates.",
+        "root_cause": "The Open Graph meta tags are incomplete, missing the essential og:image property for social media sharing.",
+        "fix_steps": [
+          "Add og:image meta tag with a high-quality 1200x630px image representing Target's brand",
+          "Include og:image:alt tag for accessibility compliance in social sharing",
+          "Test social sharing appearance using Facebook's Sharing Debugger and Twitter's Card Validator"
+        ]
+      },
+      {
+        "check": "performance",
+        "severity": "medium",
+        "title": "Slow Page Load Time",
+        "why_it_matters": "The 3.65-second response time exceeds Google's recommended 2-second threshold, potentially hurting search rankings and user experience.",
+        "root_cause": "Large content size (371KB) and potentially unoptimized server response times are causing delays in page delivery.",
+        "fix_steps": [
+          "Implement image compression and lazy loading to reduce initial page weight",
+          "Enable server-side caching and CDN optimization for faster content delivery",
+          "Minify CSS, JavaScript, and HTML to reduce file sizes"
+        ]
+      }
+    ],
+    "quick_wins": [
+      "Add og:image meta tag with Target's logo or homepage hero image",
+      "Implement alt text for the most visible above-the-fold images first",
+      "Enable browser caching headers to improve repeat visitor load times"
+    ]
+  }
+}

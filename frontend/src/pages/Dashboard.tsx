@@ -1,467 +1,332 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { TrendingUp, Activity, Shield, AlertTriangle, Play, ArrowUpRight, Inbox } from 'lucide-react'
-import { StatusBadge } from '../components/shared/StatusBadge'
-import { formatTime, formatTimestamp, getScoreColor } from '../utils/format'
+import { Play, ShieldCheck, ArrowRight, Lightbulb, Lightning, Globe, MagnifyingGlass, ArrowUpRight } from '@phosphor-icons/react'
+import { ScoreCard } from '../components/Dashboard/ScoreCard'
+import { TrendLine } from '../components/Dashboard/TrendLine'
+import { QuickStats } from '../components/Dashboard/QuickStats'
+import { RecentRuns } from '../components/Dashboard/RecentRuns'
+import { ErrorState } from '../components/shared/ErrorState'
+import { Skeleton } from '../components/shared/Skeleton'
+import { apiClient } from '../utils/api'
 import type { TestRun } from '../utils/api'
-
-const mockRuns: TestRun[] = [
-  { run_id: 'run-a1b2c3d4', timestamp: '2026-08-22T08:00:00Z', fault_type: 'ec2-termination', target_resource: 'i-0abc123', rto_seconds: 152, rpo_seconds: 45, resilience_score: 82, status: 'Passed', rto_target: 300, rpo_target: 60, report_s3_key: '' },
-  { run_id: 'run-e5f6g7h8', timestamp: '2026-08-15T08:00:00Z', fault_type: 'ec2-termination', target_resource: 'i-0def456', rto_seconds: 492, rpo_seconds: 150, resilience_score: 45, status: 'Failed', rto_target: 300, rpo_target: 60, report_s3_key: '' },
-  { run_id: 'run-i9j0k1l2', timestamp: '2026-08-08T08:00:00Z', fault_type: 'ec2-termination', target_resource: 'i-0ghi789', rto_seconds: 105, rpo_seconds: 30, resilience_score: 91, status: 'Passed', rto_target: 300, rpo_target: 60, report_s3_key: '' },
-  { run_id: 'run-m3n4o5p6', timestamp: '2026-08-01T08:00:00Z', fault_type: 'ec2-termination', target_resource: 'i-0jkl012', rto_seconds: 120, rpo_seconds: 40, resilience_score: 88, status: 'Passed', rto_target: 300, rpo_target: 60, report_s3_key: '' },
-  { run_id: 'run-q7r8s9t0', timestamp: '2026-07-25T08:00:00Z', fault_type: 'ec2-termination', target_resource: 'i-0mno345', rto_seconds: 90, rpo_seconds: 25, resilience_score: 94, status: 'Passed', rto_target: 300, rpo_target: 60, report_s3_key: '' },
-]
 
 /* ─── Skeleton Loading State ─── */
 function DashboardSkeleton() {
   return (
     <div className="page-container">
       <div style={{ marginBottom: 'var(--space-12)' }}>
-        <div className="skeleton skeleton-text" style={{ width: 120, height: 24, borderRadius: 9999, marginBottom: 16 }} />
-        <div className="skeleton skeleton-heading" />
-        <div className="skeleton skeleton-text" style={{ width: '70%' }} />
+        <Skeleton variant="pill" width={120} height={24} borderRadius={9999} style={{ marginBottom: 16 }} />
+        <Skeleton variant="heading" />
+        <Skeleton variant="text" width="70%" />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-6)', marginBottom: 'var(--space-8)' }}>
-        <div className="skeleton-card">
-          <div className="skeleton skeleton-text" style={{ width: 80, marginBottom: 24 }} />
-          <div className="skeleton skeleton-score" style={{ marginBottom: 24 }} />
-          <div className="skeleton" style={{ height: 3, borderRadius: 9999 }} />
-        </div>
+        <Skeleton variant="card">
+          <Skeleton variant="text" width={80} style={{ marginBottom: 24 }} />
+          <Skeleton variant="score" style={{ marginBottom: 24 }} />
+          <Skeleton height={3} borderRadius={9999} />
+        </Skeleton>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="skeleton skeleton-metric" />
-          ))}
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} variant="metric" />)}
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="skeleton skeleton-pill" />
-        ))}
+        {[1, 2, 3, 4].map(i => <Skeleton key={i} variant="pill" />)}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--space-6)' }}>
-        <div className="skeleton-card" style={{ height: 240 }} />
-        <div className="skeleton-card" style={{ height: 240 }} />
+        <Skeleton variant="card" height={240} />
+        <Skeleton variant="card" height={240} />
       </div>
     </div>
   )
 }
 
 /* ─── Empty State ─── */
-function EmptyState() {
+function DashboardEmpty() {
   return (
-    <div className="empty-state">
-      <div className="empty-state-icon">
-        <Inbox size={28} strokeWidth={1.5} />
+    <div className="page-container" style={{ maxWidth: 800, margin: '0 auto' }}>
+      {/* Hero */}
+      <div style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }} className="animate-in">
+        <div style={{
+          width: 64, height: 64,
+          borderRadius: 'var(--radius-lg)',
+          background: 'var(--accent-muted)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto var(--space-6)',
+        }}>
+          <ShieldCheck size={28} weight="regular" style={{ color: 'var(--accent-primary)' }} />
+        </div>
+        <h1 style={{ fontSize: 28, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: 8 }}>
+          Welcome to CloudGuard DR
+        </h1>
+        <p style={{ fontSize: 15, color: 'var(--text-secondary)', maxWidth: 500, margin: '0 auto', lineHeight: 1.6 }}>
+          Automated disaster recovery testing. Prove your systems recover when it matters, not by assumption, but by actually breaking them.
+        </p>
       </div>
-      <div className="empty-state-title">No test runs yet</div>
-      <div className="empty-state-desc">
-        Trigger your first disaster recovery test to start measuring system resilience.
+
+      {/* Quick Start Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
+        {[
+          { icon: Lightning, title: 'DR Test', desc: 'Break something, measure recovery time', color: '#EF4444', link: '/new-audit', action: 'Start Test' },
+          { icon: Globe, title: 'Site Audit', desc: 'Health checks for any external URL', color: '#3B82F6', link: '/new-audit', action: 'Run Audit' },
+          { icon: MagnifyingGlass, title: 'SEO Report', desc: 'Analyze meta tags, headings, performance', color: '#8B5CF6', link: '/new-audit', action: 'Run SEO Audit' },
+        ].map((card, i) => (
+          <Link key={i} to={card.link} className="card card-interactive animate-in" style={{
+            padding: 'var(--space-6)',
+            textDecoration: 'none',
+            animationDelay: `${i * 0.1}s`,
+          }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 'var(--radius-md)',
+              background: `${card.color}15`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 'var(--space-4)',
+            }}>
+              <card.icon size={20} weight="regular" style={{ color: card.color }} />
+            </div>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>{card.title}</h3>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 'var(--space-4)', lineHeight: 1.5 }}>{card.desc}</p>
+            <span style={{ fontSize: 12, fontWeight: 500, color: card.color, display: 'flex', alignItems: 'center', gap: 4 }}>
+              {card.action} <ArrowRight size={12} weight="bold" />
+            </span>
+          </Link>
+        ))}
       </div>
-      <Link to="/new-audit" className="btn btn-primary" style={{ padding: '12px 24px' }}>
-        <Play size={14} />
-        Run First Test
-      </Link>
+
+      {/* How it works */}
+      <div className="card animate-in animate-in-delay-2" style={{ padding: 'var(--space-8)' }}>
+        <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 'var(--space-6)' }}>
+          How CloudGuard DR Works
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-6)' }}>
+          {[
+            { step: '1', label: 'Inject', desc: 'Terminate an EC2 instance or disrupt DNS/S3' },
+            { step: '2', label: 'Monitor', desc: 'Poll health checks until recovery or timeout' },
+            { step: '3', label: 'Measure', desc: 'Calculate actual RTO and RPO' },
+            { step: '4', label: 'Score', desc: 'Convert to 0-100 resilience score' },
+          ].map((item, i) => (
+            <div key={i} style={{ textAlign: 'center' }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'var(--accent-muted)',
+                border: '1px solid var(--accent-primary)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto var(--space-3)',
+                fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700,
+                color: 'var(--accent-primary)',
+              }}>
+                {item.step}
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{item.label}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }} className="animate-in animate-in-delay-3">
+        <Link to="/new-audit" className="btn btn-primary" style={{ padding: '14px 32px', fontSize: 14 }}>
+          <Play size={14} weight="fill" />
+          Run Your First Test
+        </Link>
+      </div>
     </div>
   )
 }
 
+/* ─── Main Dashboard ─── */
 export default function Dashboard() {
   const [loading, setLoading] = useState(true)
-  const [runs] = useState<TestRun[]>(mockRuns)
+  const [error, setError] = useState<string | null>(null)
+  const [runs, setRuns] = useState<TestRun[]>([])
+  const [recommendations, setRecommendations] = useState<any[]>([])
+  const [comparisons, setComparisons] = useState<any[]>([])
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200)
-    return () => clearTimeout(timer)
+    loadData()
   }, [])
 
+  const loadData = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const [runsResult, recsResult, cmpResult] = await Promise.allSettled([
+        apiClient.getRuns({ limit: 20 }),
+        apiClient.getRecommendations({ limit: 5 }),
+        apiClient.listComparisons({ limit: 5 }),
+      ])
+
+      if (runsResult.status === 'fulfilled') {
+        setRuns(runsResult.value.runs || [])
+      } else {
+        console.error('Failed to load runs:', runsResult.reason)
+      }
+
+      if (recsResult.status === 'fulfilled') {
+        setRecommendations(recsResult.value.recommendations || [])
+      }
+
+      if (cmpResult.status === 'fulfilled') {
+        setComparisons(cmpResult.value.comparisons || [])
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Failed to load dashboard')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (loading) return <DashboardSkeleton />
-  if (runs.length === 0) return <EmptyState />
+
+  if (error) return (
+    <div className="page-container">
+      <ErrorState title="Couldn't load dashboard" description={error} onRetry={loadData} />
+    </div>
+  )
+
+  if (runs.length === 0) return <DashboardEmpty />
 
   const latestRun = runs[0]
-  const passRate = Math.round((runs.filter(r => r.status === 'Passed').length / runs.length) * 100)
-  const avgScore = Math.round(runs.reduce((sum, r) => sum + r.resilience_score, 0) / runs.length)
 
   return (
     <div className="page-container">
-      {/* Header — asymmetric, left-aligned */}
+      {/* Header */}
       <div style={{ marginBottom: 'var(--space-12)' }} className="animate-in">
         <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '5px 14px',
-          background: 'var(--accent-subtle)',
-          border: '1px solid rgba(16, 185, 129, 0.15)',
-          borderRadius: 9999,
-          fontSize: 11,
-          fontWeight: 500,
-          color: 'var(--accent-primary)',
-          marginBottom: 16,
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+          padding: '4px 12px',
+          background: latestRun.status === 'Passed' ? 'rgba(34, 197, 94, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+          border: `1px solid ${latestRun.status === 'Passed' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
+          borderRadius: 'var(--radius-sm)',
+          fontSize: 11, fontWeight: 500,
+          color: latestRun.status === 'Passed' ? '#22C55E' : '#EF4444',
+          marginBottom: 12,
         }}>
-          <span className="status-dot status-dot-live" />
-          Systems Operational
+          <span className={`status-dot ${latestRun.status === 'Passed' ? 'status-dot-live' : 'status-dot-fail'}`} />
+          {latestRun.status === 'Passed' ? 'Systems Operational' : 'Recovery Needed'}
         </div>
         <h1 style={{
-          fontSize: 32,
-          fontWeight: 700,
-          color: 'var(--text-primary)',
-          letterSpacing: '-0.03em',
-          lineHeight: 1.1,
-          marginBottom: 8,
+          fontSize: 28, fontWeight: 600, color: 'var(--text-primary)',
+          letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: 6,
         }}>
           Resilience Overview
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 480 }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 14, maxWidth: 480 }}>
           Automated disaster recovery testing. Prove your systems recover when it matters.
         </p>
       </div>
 
-      {/* Hero Score — large, asymmetric */}
-      {latestRun && (
-        <div className="animate-in animate-in-delay-1" style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 'var(--space-6)',
-          marginBottom: 'var(--space-8)',
-        }}>
-          {/* Score card — takes up more space */}
-          <div className="card" style={{
-            padding: 'var(--space-10)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            position: 'relative',
-            overflow: 'hidden',
-          }}>
-            {/* Ambient glow */}
-            <div style={{
-              position: 'absolute',
-              top: -40,
-              right: -40,
-              width: 160,
-              height: 160,
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${getScoreColor(latestRun.resilience_score)}15, transparent 70%)`,
-              pointerEvents: 'none',
-            }} />
+      {/* Hero Score Card */}
+      <ScoreCard run={latestRun} />
 
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-8)' }}>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
-                    Latest Run
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-code)' }}>
-                    {latestRun.run_id}
-                  </div>
-                </div>
-                <StatusBadge status={latestRun.status} />
-              </div>
+      {/* Quick Stats */}
+      <QuickStats runs={runs} />
 
-              {/* Score */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 'var(--space-6)' }}>
-                <span style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 72,
-                  fontWeight: 800,
-                  color: getScoreColor(latestRun.resilience_score),
-                  lineHeight: 1,
-                  letterSpacing: '-0.04em',
-                }}>
-                  {latestRun.resilience_score}
-                </span>
-                <span style={{ fontSize: 16, color: 'var(--text-muted)', fontWeight: 300 }}>/100</span>
-              </div>
+      {/* Recommendations (if any) */}
+      {recommendations.length > 0 && (
+        <div className="animate-in animate-in-delay-2" style={{ marginBottom: 'var(--space-6)' }}>
+          <div className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Lightbulb size={16} weight="regular" style={{ color: '#F59E0B', flexShrink: 0 }} />
+            <div style={{ flex: 1, fontSize: 12, color: 'var(--text-secondary)' }}>
+              <strong style={{ color: 'var(--text-primary)' }}>{recommendations.length} recommendation{recommendations.length > 1 ? 's' : ''}</strong>
+              {' - '}
+              {recommendations[0].title}
             </div>
-
-            {/* Progress bar */}
-            <div style={{
-              height: 3,
-              background: 'rgba(255, 255, 255, 0.04)',
-              borderRadius: 9999,
-              overflow: 'hidden',
-              position: 'relative',
-              zIndex: 1,
-            }}>
-              <div style={{
-                height: '100%',
-                width: `${latestRun.resilience_score}%`,
-                background: `linear-gradient(90deg, ${getScoreColor(latestRun.resilience_score)}, ${getScoreColor(latestRun.resilience_score)}88)`,
-                borderRadius: 9999,
-                transition: 'width 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                boxShadow: `0 0 12px ${getScoreColor(latestRun.resilience_score)}40`,
-              }} />
-            </div>
-          </div>
-
-          {/* Metrics column — stacked glass cards with stagger */}
-          <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-            <MetricCard label="RTO" value={formatTime(latestRun.rto_seconds)} target={formatTime(latestRun.rto_target)} ok={latestRun.rto_seconds <= latestRun.rto_target} />
-            <MetricCard label="RPO" value={formatTime(latestRun.rpo_seconds)} target={formatTime(latestRun.rpo_target)} ok={latestRun.rpo_seconds <= latestRun.rpo_target} />
-            <MetricCard label="Target" value={latestRun.target_resource} target="" ok={true} />
-            <MetricCard label="Fault" value={latestRun.fault_type.replace('-', ' ')} target="" ok={true} />
+            <Link to="/compare" style={{ fontSize: 11, color: 'var(--accent-primary)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}>
+              View insights <ArrowRight size={12} weight="bold" />
+            </Link>
           </div>
         </div>
       )}
 
-      {/* Stats Row — glass pills with stagger */}
-      <div className="animate-in animate-in-delay-2" style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 'var(--space-4)',
-        marginBottom: 'var(--space-8)',
-      }}>
-        <StatPill icon={<Activity size={16} strokeWidth={1.5} />} label="Total Runs" value={runs.length.toString()} />
-        <StatPill icon={<TrendingUp size={16} strokeWidth={1.5} />} label="Pass Rate" value={`${passRate}%`} accent />
-        <StatPill icon={<Shield size={16} strokeWidth={1.5} />} label="Avg Score" value={avgScore.toString()} />
-        <StatPill icon={<AlertTriangle size={16} strokeWidth={1.5} />} label="Failures" value={runs.filter(r => r.status === 'Failed').length.toString()} danger={runs.filter(r => r.status === 'Failed').length > 0} />
-      </div>
-
-      {/* Trend + Recent — asymmetric 2:1 */}
+      {/* Trend + Recent Runs */}
       <div className="animate-in animate-in-delay-3" style={{
-        display: 'grid',
-        gridTemplateColumns: '2fr 1fr',
-        gap: 'var(--space-6)',
-        marginBottom: 'var(--space-8)',
+        display: 'grid', gridTemplateColumns: '2fr 1fr',
+        gap: 'var(--space-6)', marginBottom: 'var(--space-8)',
       }}>
-        {/* Trend Chart */}
         <div className="card" style={{ padding: 'var(--space-8)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-              Resilience Trend
-            </h3>
+            <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Resilience Trend</h3>
             <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
               Last {runs.length} runs
             </span>
           </div>
-          <TrendChart runs={runs} />
+          <TrendLine runs={runs} />
         </div>
-
-        {/* Recent Runs */}
-        <div className="card" style={{ padding: 'var(--space-8)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-              Recent Runs
-            </h3>
-            <Link to="/runs" style={{
-              fontSize: 11,
-              color: 'var(--accent-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}>
-              View all <ArrowUpRight size={12} />
-            </Link>
-          </div>
-          <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            {runs.slice(0, 4).map((run) => (
-              <Link
-                key={run.run_id}
-                to={`/runs/${run.run_id}`}
-                className="stagger-child card-interactive"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 12px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid transparent',
-                  textDecoration: 'none',
-                }}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-code)' }}>
-                    {run.run_id.slice(0, 12)}
-                  </span>
-                  <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-                    {formatTimestamp(run.timestamp)}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: getScoreColor(run.resilience_score),
-                  }}>
-                    {run.resilience_score}
-                  </span>
-                  <StatusBadge status={run.status} size="sm" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+        <RecentRuns runs={runs} />
       </div>
 
-      {/* Actions — floating */}
+      {/* Recent Comparisons */}
+      {comparisons.length > 0 && (
+        <div className="animate-in animate-in-delay-3" style={{ marginBottom: 'var(--space-8)' }}>
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border-primary)' }}>
+              <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Recent Site Comparisons</h3>
+              <Link to="/compare" style={{ fontSize: 11, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                Compare more <ArrowUpRight size={12} weight="bold" />
+              </Link>
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.1em', padding: '10px 20px', borderBottom: '1px solid var(--border-muted)' }}>SITE A</th>
+                  <th style={{ textAlign: 'center', padding: '10px 20px', borderBottom: '1px solid var(--border-muted)' }}></th>
+                  <th style={{ textAlign: 'left', fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.1em', padding: '10px 20px', borderBottom: '1px solid var(--border-muted)' }}>SITE B</th>
+                  <th style={{ textAlign: 'center', fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.1em', padding: '10px 20px', borderBottom: '1px solid var(--border-muted)' }}>W / T / L</th>
+                  <th style={{ textAlign: 'right', fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.1em', padding: '10px 20px', borderBottom: '1px solid var(--border-muted)' }}>TIME</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisons.map((cmp: any) => {
+                  const timeAgo = (dateStr: string) => {
+                    const diff = Date.now() - new Date(dateStr).getTime()
+                    const mins = Math.floor(diff / 60000)
+                    if (mins < 1) return 'just now'
+                    if (mins < 60) return `${mins}m ago`
+                    const hours = Math.floor(mins / 60)
+                    if (hours < 24) return `${hours}h ago`
+                    const days = Math.floor(hours / 24)
+                    return `${days}d ago`
+                  }
+                  return (
+                    <tr key={cmp.comparison_id} className="table-row-interactive" style={{ cursor: 'pointer' }}>
+                      <td style={{ padding: '12px 20px', borderBottom: '1px solid var(--border-muted)' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-primary)' }}>{cmp.domain_a}</span>
+                      </td>
+                      <td style={{ padding: '12px 20px', borderBottom: '1px solid var(--border-muted)', textAlign: 'center' }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>vs</span>
+                      </td>
+                      <td style={{ padding: '12px 20px', borderBottom: '1px solid var(--border-muted)' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-primary)' }}>{cmp.domain_b}</span>
+                      </td>
+                      <td style={{ padding: '12px 20px', borderBottom: '1px solid var(--border-muted)', textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
+                        <span style={{ color: 'var(--status-pass)' }}>{cmp.summary?.a_wins ?? 0}</span>
+                        <span style={{ color: 'var(--text-muted)', margin: '0 4px' }}>/</span>
+                        <span style={{ color: 'var(--text-muted)' }}>{cmp.summary?.ties ?? 0}</span>
+                        <span style={{ color: 'var(--text-muted)', margin: '0 4px' }}>/</span>
+                        <span style={{ color: 'var(--status-fail)' }}>{cmp.summary?.b_wins ?? 0}</span>
+                      </td>
+                      <td style={{ padding: '12px 20px', borderBottom: '1px solid var(--border-muted)', textAlign: 'right' }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{timeAgo(cmp.created_at)}</span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
       <div className="animate-in animate-in-delay-4" style={{ display: 'flex', gap: 'var(--space-3)' }}>
         <Link to="/new-audit" className="btn btn-primary" style={{ padding: '12px 24px' }}>
-          <Play size={14} />
+          <Play size={14} weight="fill" />
           Run New Test
         </Link>
         <Link to="/compare" className="btn btn-secondary" style={{ padding: '12px 24px' }}>
-          Compare Runs
+          Compare Sites
         </Link>
-      </div>
-    </div>
-  )
-}
-
-/* ─── Metric Card (Glass) ─── */
-function MetricCard({ label, value, target, ok }: { label: string; value: string; target: string; ok: boolean }) {
-  return (
-    <div className="stagger-child card-interactive" style={{
-      padding: '14px 18px',
-      background: 'var(--bg-glass)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      border: '1px solid var(--border-glass)',
-      borderRadius: 'var(--radius-lg)',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    }}>
-      <div>
-        <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
-          {label}
-        </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
-          {value}
-        </div>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        {target && (
-          <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-            {target}
-          </span>
-        )}
-        <span style={{
-          width: 20,
-          height: 20,
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: ok ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)',
-        }}>
-          {ok ? (
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-pass)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          ) : (
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-fail)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          )}
-        </span>
-      </div>
-    </div>
-  )
-}
-
-/* ─── Stat Pill ─── */
-function StatPill({ icon, label, value, accent, danger }: { icon: React.ReactNode; label: string; value: string; accent?: boolean; danger?: boolean }) {
-  return (
-    <div className="card-interactive" style={{
-      padding: '16px 18px',
-      background: 'var(--bg-glass)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      border: `1px solid ${danger ? 'rgba(244, 63, 94, 0.15)' : 'var(--border-glass)'}`,
-      borderRadius: 'var(--radius-lg)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 12,
-    }}>
-      <span style={{ color: accent ? 'var(--accent-primary)' : danger ? 'var(--status-fail)' : 'var(--text-muted)' }}>
-        {icon}
-      </span>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 1 }}>{label}</div>
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 18,
-          fontWeight: 700,
-          color: accent ? 'var(--accent-primary)' : danger ? 'var(--status-fail)' : 'var(--text-primary)',
-          letterSpacing: '-0.02em',
-        }}>
-          {value}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ─── Trend Chart ─── */
-function TrendChart({ runs }: { runs: TestRun[] }) {
-  const reversed = [...runs].reverse()
-  const maxScore = 100
-  const width = 100
-  const height = 40
-  const padding = { top: 5, right: 5, bottom: 5, left: 5 }
-
-  const points = reversed.map((run, i) => {
-    const x = padding.left + (i / Math.max(reversed.length - 1, 1)) * (width - padding.left - padding.right)
-    const y = padding.top + (1 - run.resilience_score / maxScore) * (height - padding.top - padding.bottom)
-    return { x, y, run }
-  })
-
-  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
-
-  // Gradient fill path
-  const fillD = pathD + ` L ${points[points.length - 1].x} ${height - padding.bottom} L ${points[0].x} ${height - padding.bottom} Z`
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 140 }}>
-        <defs>
-          <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="var(--accent-primary)" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="1" />
-          </linearGradient>
-          <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--accent-primary)" stopOpacity="0.12" />
-            <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {/* Grid lines */}
-        {[0, 25, 50, 75, 100].map(val => {
-          const y = padding.top + (1 - val / maxScore) * (height - padding.top - padding.bottom)
-          return (
-            <g key={val}>
-              <line x1={padding.left} y1={y} x2={width - padding.right} y2={y} stroke="rgba(255,255,255,0.03)" strokeWidth="0.2" />
-              <text x={padding.left - 1.5} y={y + 0.8} fill="var(--text-muted)" fontSize="2.2" fontFamily="var(--font-mono)" textAnchor="end">{val}</text>
-            </g>
-          )
-        })}
-
-        {/* Fill area */}
-        <path d={fillD} fill="url(#fillGrad)" />
-
-        {/* Line */}
-        <path d={pathD} fill="none" stroke="url(#lineGrad)" strokeWidth="0.7" strokeLinecap="round" strokeLinejoin="round" />
-
-        {/* Dots with glow */}
-        {points.map((p, i) => (
-          <g key={i}>
-            <circle cx={p.x} cy={p.y} r="2" fill="var(--accent-primary)" opacity="0.2" />
-            <circle cx={p.x} cy={p.y} r="1.2" fill="var(--accent-primary)" />
-          </g>
-        ))}
-      </svg>
-
-      {/* Labels */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-        {reversed.map((run, i) => (
-          <span key={i} style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-            {new Date(run.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-          </span>
-        ))}
       </div>
     </div>
   )

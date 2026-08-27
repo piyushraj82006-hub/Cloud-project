@@ -70,6 +70,13 @@ variable "score_threshold" {
   default     = 70
 }
 
+variable "openrouter_api_key" {
+  description = "OpenRouter API key for AI insights (stored in SSM as SecureString)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 # ─── Module Calls ───────────────────────────────────────────────────
 
 module "network" {
@@ -131,6 +138,8 @@ module "step_functions" {
   measurement_lambda_arn = module.lambda.measurement_lambda_arn
   scoring_lambda_arn     = module.lambda.scoring_lambda_arn
   audit_report_lambda_arn = module.lambda.audit_report_lambda_arn
+  pdf_report_lambda_arn  = module.lambda.pdf_report_lambda_arn
+  ai_insights_lambda_arn = module.lambda.ai_insights_lambda_arn
   alert_lambda_arn       = module.lambda.alert_lambda_arn
   step_functions_role_arn = module.iam.step_functions_role_arn
 }
@@ -164,6 +173,7 @@ module "lambda" {
   seo_report_role_arn  = module.iam.seo_report_lambda_role_arn
   competitor_analysis_role_arn = module.iam.competitor_analysis_lambda_role_arn
   pdf_report_role_arn         = module.iam.pdf_report_lambda_role_arn
+  ai_insights_role_arn        = module.iam.ai_insights_lambda_role_arn
   client_intake_role_arn      = module.iam.client_intake_lambda_role_arn
 
   # DynamoDB
@@ -216,6 +226,7 @@ module "ssm" {
   test_runs_table  = module.dynamodb.test_runs_table_name
   audit_reports_table = module.dynamodb.audit_reports_table_name
   reports_bucket   = module.s3.reports_bucket_id
+  openrouter_api_key = var.openrouter_api_key
 }
 
 module "eventbridge" {

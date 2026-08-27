@@ -1,1 +1,3 @@
-weasyprint==62.3
+# PDF generation uses PDFBolt API (no local deps needed)
+# Only boto3 is required for S3/SSM access
+boto3>=1.28.0

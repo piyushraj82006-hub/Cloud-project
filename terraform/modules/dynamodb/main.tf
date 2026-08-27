@@ -126,3 +126,43 @@ output "clients_table_name" {
 output "clients_table_arn" {
   value = aws_dynamodb_table.clients.arn
 }
+
+# ─── Comparisons Table ─────────────────────────────────────────────
+
+resource "aws_dynamodb_table" "comparisons" {
+  name         = "${local.name_prefix}-comparisons"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "comparison_id"
+
+  attribute {
+    name = "comparison_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "created_at"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "created_at-index"
+    hash_key        = "created_at"
+    projection_type = "ALL"
+  }
+
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  tags = {
+    Name = "${local.name_prefix}-comparisons"
+  }
+}
+
+output "comparisons_table_name" {
+  value = aws_dynamodb_table.comparisons.name
+}
+
+output "comparisons_table_arn" {
+  value = aws_dynamodb_table.comparisons.arn
+}

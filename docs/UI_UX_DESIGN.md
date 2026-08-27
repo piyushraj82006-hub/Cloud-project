@@ -1,8 +1,9 @@
 # CloudGuard DR — UI/UX Design Specification
 
-**Version:** 1.0 (MVP)
-**Date:** August 22, 2026
+**Version:** 2.0 (Ethereal Glass)
+**Date:** August 24, 2026
 **Project:** CloudGuard DR — Dashboard UI/UX
+**Aesthetic:** Ethereal Glass — dark tech, premium SaaS, glassmorphism
 
 ---
 
@@ -11,7 +12,7 @@
 1. **Score first, details second** — A manager should understand system health in under 5 seconds
 2. **Failures are visually loud** — Red for failures, not hidden behind green summaries
 3. **Comparison reads left-to-right** — Like a table, not scrolling between pages
-4. **Dark, minimal, technical** — AI startup + developer docs + premium SaaS aesthetic
+4. **Dark, glass, technical** — AI startup + developer docs + premium SaaS aesthetic with glassmorphism
 5. **Engineering product feel** — Dense typography, monospace numbers, terminal UI elements
 
 ---
@@ -20,41 +21,47 @@
 
 ### Backgrounds
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `--bg-primary` | `#0A0A0A` | Main page background |
-| `--bg-secondary` | `#111111` | Secondary sections, sidebars |
-| `--bg-card` | `#151515` | Card backgrounds |
-| `--bg-elevated` | `#1A1A1A` | Elevated cards, modals |
-| `--bg-input` | `#0D0D0D` | Form inputs |
-| `--border-primary` | `#292929` | Card borders, dividers |
-| `--border-muted` | `#202020` | Subtle separators |
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--bg-primary` | `#050508` | Main page background (OLED-grade) |
+| `--bg-secondary` | `#0c0c10` | Secondary sections, sidebars |
+| `--bg-card` | `rgba(15, 15, 20, 0.7)` | Card backgrounds (glass) |
+| `--bg-elevated` | `rgba(20, 20, 28, 0.8)` | Elevated cards, modals (glass) |
+| `--bg-input` | `#0a0a0e` | Form inputs |
+| `--bg-hover` | `rgba(255, 255, 255, 0.03)` | Hover states |
+| `--bg-glass` | `rgba(255, 255, 255, 0.03)` | Glass surfaces |
+| `--bg-glass-hover` | `rgba(255, 255, 255, 0.06)` | Glass hover |
+| `--border-primary` | `rgba(255, 255, 255, 0.06)` | Card borders (hairline) |
+| `--border-muted` | `rgba(255, 255, 255, 0.04)` | Subtle separators |
+| `--border-glass` | `rgba(255, 255, 255, 0.08)` | Glass card borders |
 
 ### Text
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `--text-primary` | `#F5F5F5` | Headings, important text |
-| `--text-secondary` | `#A1A1A1` | Body text, descriptions |
-| `--text-muted` | `#666666` | Labels, timestamps |
-| `--text-code` | `#8B8B8B` | Monospace text, IDs |
+| `--text-primary` | `#e8e8ec` | Headings, important text |
+| `--text-secondary` | `#8a8a95` | Body text, descriptions |
+| `--text-muted` | `#505060` | Labels, timestamps |
+| `--text-code` | `#6a6a78` | Monospace text, IDs |
 
 ### Accent
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `--accent-primary` | `#2563EB` | Buttons, links, active states, graph lines |
-| `--accent-hover` | `#3B82F6` | Hover states |
-| `--accent-muted` | `rgba(37,99,235,0.15)` | Subtle blue backgrounds |
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--accent-primary` | `#10b981` | Buttons, links, active states, graph lines (teal) |
+| `--accent-hover` | `#34d399` | Hover states |
+| `--accent-muted` | `rgba(16, 185, 129, 0.1)` | Subtle teal backgrounds |
+| `--accent-glow` | `rgba(16, 185, 129, 0.15)` | Glow effects |
+| `--accent-subtle` | `rgba(16, 185, 129, 0.05)` | Ultra-subtle teal tints |
 
 ### Status
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `--status-pass` | `#22C55E` | Passed tests, improvements |
-| `--status-fail` | `#EF4444` | Failed tests, regressions |
-| `--status-warn` | `#F59E0B` | Incomplete runs, warnings |
-| `--status-info` | `#3B82F6` | In-progress states |
+| `--status-pass` | `#10b981` | Passed tests, improvements (matches accent) |
+| `--status-fail` | `#f43f5e` | Failed tests, regressions (rose) |
+| `--status-warn` | `#f59e0b` | Incomplete runs, warnings |
+| `--status-info` | `#6366f1` | In-progress states (indigo) |
 
 ---
 
@@ -63,11 +70,11 @@
 ### Font Stack
 
 ```css
-/* Primary — Inter */
---font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+/* Primary — Outfit */
+--font-primary: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
 
 /* Monospace — JetBrains Mono (for code, numbers, terminal UI) */
---font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', monospace;
+--font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
 ```
 
 ### Type Scale
@@ -117,18 +124,21 @@ Base unit: **8px**
 ### 5.1 Navigation Bar
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│  CLOUDGUARD   Dashboard   Runs   Compare   Settings         [Avatar]│
-├─────────────────────────────────────────────────────────────────────┤
+┌──────────────────────────────────────────────────────────────────────┐
+│   ● CGDR │ Dashboard  Runs  Compare  Clients  Settings │ ☀/🌙     │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
-- Background: `#0A0A0A` with `1px solid #222` bottom border
-- Height: 56px
-- Nav items: 13px, Inter, weight 400
-- Active item: blue text + 2px blue bottom border
-- Logo: 14px bold, monospace
-- Avatar: 32px circle, shows initial
-- No hamburger on desktop; hamburger menu on mobile (< 768px)
+- **Floating glass pill** centered at top, `sticky top: 16px`
+- Background: `rgba(10, 10, 14, 0.8)` with `backdrop-filter: blur(24px) saturate(1.4)`
+- Border: `1px solid rgba(255, 255, 255, 0.06)`, `border-radius: 9999px`
+- Shadow: `0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04)`
+- Nav items: 12px, Outfit, weight 400, icons + labels
+- Active item: teal text + subtle teal bg pill
+- Logo: "CG**DR**" abbreviated, 12px bold monospace, green live dot
+- Theme toggle: Sun/Moon icon button (32px)
+- Mobile (< 768px): labels hidden, icons only; hamburger menu overlay
+- Dividers: 1px `rgba(255, 255, 255, 0.06)` between logo, nav items, and theme toggle
 
 ### 5.2 Score Card (Dashboard Hero)
 
@@ -144,12 +154,13 @@ Base unit: **8px**
 └─────────────────────────────────────────────────────────┘
 ```
 
-- Card: `#151515` bg, `1px solid #292929`
-- Score number: 64px, JetBrains Mono, weight 700
-- Score color: blue if ≥ 70, yellow if 50–69, red if < 50
-- Progress bar: thin (4px), blue fill, gray track
-- RTO/RPO: monospace, with colored dot (green = under target, red = over)
-- Status badge: small pill, green bg for PASSED, red bg for FAILED
+- Card: glass bg (`rgba(15, 15, 20, 0.7)`), `backdrop-filter: blur(24px)`, glass border
+- Score number: 72px, JetBrains Mono, weight 800, with ambient glow radial gradient
+- Score color: teal if ≥ 70, yellow if 50–69, rose if < 50
+- Progress bar: thin (3px), gradient teal fill with glow shadow, gray track
+- RTO/RPO: monospace, displayed as stacked glass metric cards with check/cross indicators
+- Status badge: small pill, teal bg for PASSED, rose bg for FAILED
+- Score animates from 0 to value over 800ms on mount
 - Padding: 32px
 
 ### 5.3 Trend Line (Score Over Time)
@@ -247,48 +258,53 @@ IN-PROGRESS → Blue pill (#3B82F6 bg, white text, pulsing animation)
 
 **Primary Button:**
 ```css
-background: #2563EB;
-color: white;
+background: var(--accent-primary); /* #10b981 teal */
+color: #050508;
 font-size: 13px;
-font-weight: 500;
-padding: 8px 16px;
-border-radius: 4px;
+font-weight: 600;
+padding: 10px 20px;
+border-radius: 9999px; /* pill */
 border: none;
-height: 38px;
+box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
 ```
 
 **Secondary Button:**
 ```css
-background: transparent;
-color: #A1A1A1;
-border: 1px solid #292929;
+background: var(--bg-glass); /* rgba(255,255,255,0.03) */
+backdrop-filter: blur(12px);
+color: var(--text-secondary);
+border: 1px solid var(--border-glass);
+border-radius: 9999px;
 ```
 
 **Danger Button:**
 ```css
-background: #EF4444;
+background: var(--status-fail); /* #f43f5e */
 color: white;
+font-weight: 600;
+border-radius: 9999px;
 ```
 
-- No pill-shaped buttons (sharp, technical feel)
-- Hover: lighten by 10%
-- Disabled: 50% opacity, no pointer cursor
+- **Pill-shaped buttons** with glass architecture
+- Hover: `translateY(-1px)`, increased glow shadow, `::before` gradient overlay
+- Active: `scale(0.96) translateY(1px)`, reduced shadow
+- Disabled: 40% opacity, no pointer cursor, no transform
 
 ### 5.8 Form Inputs
 
 ```css
-background: #0D0D0D;
-border: 1px solid #292929;
-color: #F5F5F5;
+background: var(--bg-input); /* #0a0a0e */
+border: 1px solid var(--border-primary);
+color: var(--text-primary);
 font-size: 14px;
-padding: 8px 12px;
-border-radius: 4px;
-height: 38px;
+padding: 10px 14px;
+border-radius: var(--radius-sm); /* 8px */
+outline: none;
 
 /* Focus */
-border-color: #2563EB;
+border-color: var(--accent-primary); /* #10b981 */
 outline: none;
-box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+box-shadow: 0 0 0 3px var(--accent-subtle), 0 0 20px rgba(16, 185, 129, 0.05);
 ```
 
 ### 5.9 Skeleton Loading States
@@ -570,11 +586,17 @@ All animations respect `prefers-reduced-motion: reduce` — instant transitions 
 
 ---
 
-## 10. Dark Mode (Default — No Light Mode)
+## 10. Theme Support (Dark Default + Light Mode)
 
-The entire application is dark-mode only. No theme toggle.
+The application defaults to dark mode but includes a **light theme** toggled via the navbar.
 
-**Rationale:** The product is a technical monitoring tool. Dark mode is the standard for dashboards, terminals, and engineering tools.
+- Dark theme: OLED-grade blacks, teal accents, glass surfaces
+- Light theme: Warm whites, adjusted teal accents, subtle glass effects
+- Theme stored in `localStorage` (`cloudguard_theme`)
+- Respects `prefers-color-scheme` system preference on first visit
+- All glass effects, shadows, and borders have light-theme counterparts in `[data-theme="light"]`
+
+**Rationale:** While dark mode is the default for technical dashboards, supporting light mode improves accessibility and user preference flexibility.
 
 ---
 
@@ -674,12 +696,12 @@ frontend/src/
 | **React 18** | UI framework |
 | **TypeScript** | Type safety |
 | **Vite** | Build tool / dev server |
-| **React Router v6** | Client-side routing |
-| **Recharts** | Charts and data visualization |
+| **React Router v7** | Client-side routing |
+| **Custom SVG Charts** | Lightweight inline SVG trend charts (no external chart library) |
 | **Lucide React** | Icons |
-| **CSS Modules** | Scoped styling (or Tailwind — TBD) |
-| **Axios** | HTTP client |
-| **AWS Amplify** (or raw Cognito SDK) | Authentication |
+| **Vanilla CSS** | Global styles with CSS custom properties (design tokens) |
+| **Axios** | HTTP client with JWT interceptor |
+| **Cognito JWT** | Authentication via localStorage token |
 
 ---
 
@@ -687,36 +709,42 @@ frontend/src/
 
 ```css
 :root {
-  /* Backgrounds */
-  --bg-primary: #0A0A0A;
-  --bg-secondary: #111111;
-  --bg-card: #151515;
-  --bg-elevated: #1A1A1A;
-  --bg-input: #0D0D0D;
+  /* Backgrounds (OLED-grade darks) */
+  --bg-primary: #050508;
+  --bg-secondary: #0c0c10;
+  --bg-card: rgba(15, 15, 20, 0.7);
+  --bg-elevated: rgba(20, 20, 28, 0.8);
+  --bg-input: #0a0a0e;
+  --bg-hover: rgba(255, 255, 255, 0.03);
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --bg-glass-hover: rgba(255, 255, 255, 0.06);
 
-  /* Borders */
-  --border-primary: #292929;
-  --border-muted: #202020;
-  --border-focus: #2563EB;
+  /* Borders (subtle hairlines) */
+  --border-primary: rgba(255, 255, 255, 0.06);
+  --border-muted: rgba(255, 255, 255, 0.04);
+  --border-focus: var(--accent-primary);
+  --border-glass: rgba(255, 255, 255, 0.08);
 
   /* Text */
-  --text-primary: #F5F5F5;
-  --text-secondary: #A1A1A1;
-  --text-muted: #666666;
-  --text-code: #8B8B8B;
+  --text-primary: #e8e8ec;
+  --text-secondary: #8a8a95;
+  --text-muted: #505060;
+  --text-code: #6a6a78;
 
-  /* Accent */
-  --accent-primary: #2563EB;
-  --accent-hover: #3B82F6;
-  --accent-muted: rgba(37, 99, 235, 0.15);
+  /* Accent (teal) */
+  --accent-primary: #10b981;
+  --accent-hover: #34d399;
+  --accent-muted: rgba(16, 185, 129, 0.1);
+  --accent-glow: rgba(16, 185, 129, 0.15);
+  --accent-subtle: rgba(16, 185, 129, 0.05);
 
   /* Status */
-  --status-pass: #22C55E;
-  --status-fail: #EF4444;
-  --status-warn: #F59E0B;
-  --status-info: #3B82F6;
+  --status-pass: #10b981;
+  --status-fail: #f43f5e;
+  --status-warn: #f59e0b;
+  --status-info: #6366f1;
 
-  /* Spacing */
+  /* Spacing (8px base) */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -725,26 +753,43 @@ frontend/src/
   --space-6: 24px;
   --space-8: 32px;
   --space-10: 40px;
+  --space-12: 48px;
   --space-16: 64px;
   --space-20: 80px;
-  --space-24: 120px;
+  --space-24: 96px;
 
   /* Typography */
-  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', monospace;
+  --font-primary: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
 
   /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 9999px;
 
-  /* Shadows */
-  --shadow-card: none; /* Use borders, not shadows */
-  --shadow-elevated: none;
+  /* Transitions (spring-like cubic bezier) */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --transition-fast: 200ms var(--ease-out-expo);
+  --transition-normal: 400ms var(--ease-out-expo);
+  --transition-slow: 700ms var(--ease-out-expo);
+  --transition-spring: 500ms var(--ease-out-back);
 
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-normal: 300ms ease;
-  --transition-slow: 600ms ease;
+  /* Shadows (tinted to background) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 40px rgba(16, 185, 129, 0.08);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Glass */
+  --glass-blur: blur(24px) saturate(1.4);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.06);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 ```

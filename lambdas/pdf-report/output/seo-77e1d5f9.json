@@ -1,0 +1,44 @@
+{
+  "report_id": "seo-77e1d5f9",
+  "target_url": "https://www.dell.com",
+  "generated_at": "2026-08-24T16:51:23Z",
+  "seo_score": 100,
+  "seo_checks": {
+    "title": {
+      "present": true,
+      "issues": [],
+      "value": "Dell Technologies Official Site | Dell India"
+    },
+    "meta_description": {
+      "present": true,
+      "issues": [],
+      "value": "Visit Dell.com to see our technology solutions, services & support. Find our Premier Login, find a Dell Partner, or Book a Sales call today."
+    },
+    "headings": {
+      "issues": [],
+      "h1_count": 1,
+      "has_h1": true
+    },
+    "images": {
+      "issues": [],
+      "total": 15,
+      "with_alt": 15
+    },
+    "canonical": {
+      "present": true,
+      "issues": []
+    },
+    "open_graph": {
+      "issues": [],
+      "tags_missing": []
+    },
+    "viewport": {
+      "present": true,
+      "issues": []
+    }
+  },
+  "response_time_ms": 2246,
+  "page_fetched": true,
+  "status_code": 200,
+  "content_length": 638528
+}
