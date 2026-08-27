@@ -141,3 +141,4 @@ Estimated monthly cost: **~$7.50–$15** (within AWS free tier for most services
 
 MIT
 # Cloud-project
+# Cloud-project
