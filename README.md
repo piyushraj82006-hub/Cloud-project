@@ -1,4 +1,5 @@
-# CloudGuard DR
+# CloudGuard DR PROJECT
+
 
 **Automated Disaster Recovery Testing, Resilience Scoring & Site Audit Comparison Platform**
 
@@ -140,5 +141,3 @@ Estimated monthly cost: **~$7.50–$15** (within AWS free tier for most services
 ## License
 
 MIT
-# Cloud-project
-# Cloud-project
